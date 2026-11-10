@@ -90,7 +90,7 @@ async function fetchAssemblyBody(item) {
   if (item.bill_id) urls.push(`https://likms.assembly.go.kr/bill/billDetail.do?billId=${item.bill_id}`);
   for (const u of urls.filter(Boolean)) {
     try {
-      const m = htmlToText(await get(u)).match(/제안이유[\s\S]{30,4000}/);
+       const m = htmlToText(await get(u)).match(/제안이유[\s\S]{30,4000}?(?=의견제출 방법|의견등록|입법예고 목록보기|$)/);
       if (m) return m[0].slice(0, 4000).trim();
     } catch {}
   }
