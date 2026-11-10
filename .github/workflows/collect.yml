@@ -3,7 +3,7 @@ name: collect
 on:
   schedule:
     - cron: "17 22,3,9 * * *"   # 한국시간 07:17, 12:17, 18:17
-  workflow_dispatch:            # 수동 실행 버튼
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,13 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: 저장소 내려받기
-        uses: actions/checkout@v4
+      - name: 저장소 내려받기 (항상 최신 main)
+        uses: actions/checkout@v5
+        with:
+          ref: main
 
       - name: Node.js 준비
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
 
       - name: 입법예고 수집
         run: node scripts/collect.mjs
@@ -38,8 +40,13 @@ jobs:
           git add docs/data
           if git diff --cached --quiet; then
             echo "변경 없음"
-          else
-            git commit -m "data: $(TZ=Asia/Seoul date '+%F %H:%M')"
-            git pull --rebase
-            git push
+            exit 0
           fi
+          git commit -m "data: $(TZ=Asia/Seoul date '+%F %H:%M')"
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push origin HEAD:main && exit 0
+            echo "저장 재시도 $i/3"
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          exit 1
