@@ -1,57 +1,166 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>에너지 입법예고 워치</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-body{font-family:system-ui,'Pretendard','Malgun Gothic',sans-serif;max-width:1000px;margin:auto;padding:16px;background:#f7f8fa;color:#222}
-h1{margin-bottom:4px}
-.chips button{margin:3px;padding:6px 12px;border-radius:16px;border:1px solid #ccc;background:#fff;cursor:pointer}
-.chips button.on{background:#0a6;color:#fff;border-color:#0a6}
-.card{background:#fff;border-radius:10px;padding:14px 16px;margin:10px 0;box-shadow:0 1px 3px #0001}
-.card h3{margin:8px 0 4px;font-size:17px}.card a{color:#1a4fa0;text-decoration:none}
-.tag{font-size:12px;background:#e8f5ee;color:#075;padding:2px 8px;border-radius:10px;margin-right:4px}
-.new{background:#e33;color:#fff}.src{background:#eef;color:#336}.end{opacity:.5}
-.meta{color:#666;font-size:13px}.sum{white-space:pre-wrap;margin-top:8px;line-height:1.6}
-input,select{padding:8px;margin:4px 4px 4px 0;border:1px solid #ccc;border-radius:6px}
-</style></head><body>
-<h1>⚡ 에너지 입법예고 워치</h1>
-<div class="meta" id="upd"></div>
-<div><input id="q" placeholder="검색 (법령명, 부처, 위원회…)" size="30">
-<select id="src"><option value="">전체 출처</option><option>국회</option><option>정부</option></select>
-<select id="st"><option value="진행">진행중</option><option value="">전체</option><option value="종료">종료</option></select></div>
-<div class="chips" id="chips"></div>
-<div id="list">불러오는 중…</div>
+:root{--bg:#f4f6f9;--card:#fff;--text:#1d2433;--sub:#6b7280;--line:#e5e7eb;--brand:#0f766e;--soft:#f0fdfa;--chip:#f3f4f6}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141b;--card:#18202b;--text:#e6e9ef;--sub:#9aa3b2;--line:#2a3442;--soft:#11302d;--chip:#232d3a}}
+*{box-sizing:border-box}
+body{margin:0;font-family:Pretendard,system-ui,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+header{background:linear-gradient(135deg,#0f766e 0%,#0e7490 55%,#1e3a8a 100%);color:#fff;padding:40px 0 88px}
+header h1{margin:0;font-size:30px;letter-spacing:-.6px}
+header p{margin:6px 0 0;opacity:.85;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:-60px}
+.stat{background:var(--card);border-radius:16px;padding:18px 20px;box-shadow:0 6px 20px #0000000f;border:1px solid var(--line)}
+.stat b{display:block;font-size:28px;letter-spacing:-.5px}
+.stat span{font-size:13px;color:var(--sub)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:24px 0 12px}
+.search{flex:1;min-width:240px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);font:inherit}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{border:0;background:none;padding:11px 15px;cursor:pointer;color:var(--sub);font:inherit;font-size:14px}
+.seg button.on{background:var(--brand);color:#fff}
+select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);font:inherit;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);padding:6px 13px;border-radius:999px;cursor:pointer;font:inherit;font-size:13px}
+.chip i{font-style:normal;opacity:.6;margin-left:3px}
+.chip.on{color:#fff;border-color:transparent}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;padding-bottom:40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 28px #00000014}
+.card.ended{opacity:.55}
+.top{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.b{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px}
+.b.na{background:#dbeafe;color:#1d4ed8}.b.gov{background:#d1fae5;color:#047857}.b.new{background:#fee2e2;color:#b91c1c}
+.dday{margin-left:auto;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;background:var(--chip);color:var(--sub)}
+.dday.hot{background:#dc2626;color:#fff}
+.card h3{margin:0;font-size:17px;line-height:1.45;letter-spacing:-.3px}
+.meta{font-size:13px;color:var(--sub)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;color:#fff}
+.one{background:var(--soft);border-left:3px solid #14b8a6;padding:10px 13px;border-radius:8px;font-size:14px}
+.more{display:none;font-size:14px;border-top:1px dashed var(--line);padding-top:6px}
+.card.open .more{display:block}
+.more h4{margin:14px 0 4px;font-size:13px;color:#0d9488}
+.more p{margin:0}.more ul{margin:0;padding-left:18px}.more li{margin:2px 0}
+.raw{white-space:pre-wrap;font-size:12.5px;color:var(--sub);max-height:280px;overflow:auto;background:var(--bg);padding:12px;border-radius:8px}
+.actions{display:flex;gap:8px;margin-top:auto;padding-top:6px}
+.btn{flex:1;text-align:center;padding:10px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--text);cursor:pointer;font:inherit;font-size:13px;text-decoration:none}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.empty{grid-column:1/-1;text-align:center;color:var(--sub);padding:70px 0}
+footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}header h1{font-size:24px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>⚡ 에너지 입법예고 워치</h1>
+  <p>국회·정부 입법예고 중 탈탄소·전력·집단에너지·재생에너지 관련 법안을 자동 수집합니다 · <span id="upd">불러오는 중…</span></p>
+</div></header>
+
+<main class="wrap">
+  <section class="stats" id="stats"></section>
+
+  <div class="toolbar">
+    <input class="search" id="q" placeholder="법령명, 부처, 위원회, 요약 내용 검색">
+    <div class="seg" id="src">
+      <button data-v="" class="on">전체</button><button data-v="국회">국회</button><button data-v="정부">정부</button>
+    </div>
+    <select id="status"><option value="진행">진행중</option><option value="">전체</option><option value="종료">종료</option></select>
+    <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option></select>
+  </div>
+
+  <div class="chips" id="chips"></div>
+  <section class="grid" id="grid"><div class="empty">불러오는 중…</div></section>
+</main>
+<footer>출처: 열린국회정보 · 국민참여입법센터 | 요약은 AI가 생성한 것으로, 정확한 내용은 원문을 확인하세요.</footer>
+
 <script>
-let data=[],cat='';
-const $=id=>document.getElementById(id);
+const COLORS={"탈탄소·기후":"#16a34a","집단에너지·열":"#ea580c","전기·전력":"#2563eb","재생에너지·PPA":"#0d9488","원자력":"#7c3aed","수소":"#0891b2","가스·석유·자원":"#b45309","에너지 일반·효율":"#64748b"};
+const color=c=>COLORS[c]||'#475569';
+const st={cat:'',src:'',status:'진행',sort:'new',q:''};
+let data=[];
+const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const isNew=s=>s&&(Date.now()-new Date(s.replace(' ','T')+':00+09:00'))/864e5<3;
-Promise.all([fetch('data/bills.json',{cache:'no-store'}).then(r=>r.json()),
-             fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json())])
-.then(([d,m])=>{
-  data=d;
-  $('upd').textContent='마지막 수집: '+m.updated+(m.sources&&m.sources.length?' (성공: '+m.sources.join(', ')+')':'');
-  const cats=[...new Set(d.flatMap(x=>x.categories||[]))];
-  $('chips').innerHTML=['전체',...cats].map(c=>{
-    const v=c==='전체'?'':c, n=v?d.filter(x=>(x.categories||[]).includes(v)).length:d.length;
-    return `<button data-c="${esc(v)}">${esc(c)} (${n})</button>`}).join('');
-  $('chips').onclick=e=>{if(e.target.dataset.c!==undefined){cat=e.target.dataset.c;render()}};
-  ['q','src','st'].forEach(i=>$(i).oninput=render);
-  render();
-}).catch(()=>{$('list').textContent='데이터를 불러오지 못했습니다.'});
-function render(){
-  const q=$('q').value.trim(),s=$('src').value,st=$('st').value;
-  document.querySelectorAll('.chips button').forEach(b=>b.classList.toggle('on',b.dataset.c===cat));
-  const rows=data.filter(x=>(!cat||(x.categories||[]).includes(cat))&&(!s||x.source===s)&&(!st||x.status===st)
-    &&(!q||[x.title,x.proposer,x.org,x.field].join(' ').includes(q)));
-  $('list').innerHTML=rows.map(x=>`
-  <div class="card ${x.status==='종료'?'end':''}">
-    ${isNew(x.first_seen)?'<span class="tag new">NEW</span>':''}<span class="tag src">${esc(x.source)}</span>
-    ${(x.categories||[]).map(c=>`<span class="tag">${esc(c)}</span>`).join('')}
-    <h3><a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}</a></h3>
-    <div class="meta">${esc(x.proposer)}${x.org?' · '+esc(x.org):''}${x.field?' · '+esc(x.field):''}
-      · 예고기간 ${esc(x.start)} ~ ${esc(x.end)} · 수집 ${esc(x.first_seen)}</div>
-    ${x.summary?`<div class="sum">🤖 ${esc(x.summary)}</div>`:''}
-    ${x.body?`<details><summary>개정이유·주요내용 원문</summary><div class="sum">${esc(x.body)}</div></details>`:''}
-  </div>`).join('')||'<p>해당 건이 없습니다.</p>';
+const parseDate=s=>{const m=String(s||'').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);return m?new Date(+m[1],m[2]-1,+m[3]):null};
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const dday=x=>{const e=parseDate(x.end);return e?Math.round((e-today())/864e5):null};
+const age=s=>s?(Date.now()-new Date(s.replace(' ','T')+':00+09:00'))/864e5:999;
+const sum=x=>!x.summary?null:(typeof x.summary==='string'?{oneline:x.summary}:x.summary);
+
+Promise.all([
+  fetch('data/bills.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json())
+]).then(([d,m])=>{
+  data=d.map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
+  $('#upd').textContent='마지막 수집 '+m.updated;
+  bind();render();
+}).catch(()=>{$('#grid').innerHTML='<div class="empty">데이터를 불러오지 못했습니다.</div>'});
+
+function bind(){
+  $('#q').oninput=e=>{st.q=e.target.value.trim();render()};
+  $('#status').onchange=e=>{st.status=e.target.value;render()};
+  $('#sort').onchange=e=>{st.sort=e.target.value;render()};
+  $('#src').onclick=e=>{const b=e.target.closest('button');if(!b)return;st.src=b.dataset.v;
+    [...$('#src').children].forEach(x=>x.classList.toggle('on',x===b));render()};
+  $('#chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;st.cat=b.dataset.c;render()};
+  $('#grid').onclick=e=>{const b=e.target.closest('[data-toggle]');if(!b)return;
+    const c=b.closest('.card');c.classList.toggle('open');b.textContent=c.classList.contains('open')?'접기':'자세히 보기'};
 }
-</script></body></html>
+
+function base(){return data.filter(x=>(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
+  &&(!st.q||[x.title,x.proposer,x.org,x.field,sum(x)?.oneline].join(' ').toLowerCase().includes(st.q.toLowerCase())))}
+
+function render(){
+  const live=data.filter(x=>x.status==='진행');
+  const na=live.filter(x=>x.source==='국회').length;
+  $('#stats').innerHTML=[
+    [live.length,'진행 중인 입법예고'],
+    [data.filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
+    [live.filter(x=>{const n=dday(x);return n!==null&&n<=7}).length,'7일 내 의견마감'],
+    [`${na} / ${live.length-na}`,'국회 / 정부']
+  ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+
+  const rows=base();
+  const cats=Object.keys(COLORS).filter(c=>data.some(x=>(x.categories||[]).includes(c)));
+  $('#chips').innerHTML=[['','전체',rows.length],...cats.map(c=>[c,c,rows.filter(x=>(x.categories||[]).includes(c)).length])]
+    .map(([v,l,n])=>`<button class="chip ${st.cat===v?'on':''}" data-c="${esc(v)}" style="${st.cat===v?`background:${v?color(v):'#0f766e'}`:''}">${esc(l)}<i>${n}</i></button>`).join('');
+
+  let list=rows.filter(x=>!st.cat||(x.categories||[]).includes(st.cat));
+  if(st.sort==='due')list.sort((a,b)=>{const f=x=>{const n=dday(x);return n===null||n<0?99999:n};return f(a)-f(b)});
+  else list.sort((a,b)=>(b.first_seen||'').localeCompare(a.first_seen||''));
+  $('#grid').innerHTML=list.map(card).join('')||'<div class="empty">조건에 맞는 법안이 없습니다.</div>';
+}
+
+function card(x){
+  const n=dday(x),s=sum(x);
+  const dd=n===null?'':n<0?'마감':n===0?'D-DAY':'D-'+n;
+  return `<article class="card ${x.status==='종료'?'ended':''}">
+    <div class="top">
+      <span class="b ${x.source==='국회'?'na':'gov'}">${esc(x.source)}</span>
+      ${age(x.first_seen)<3?'<span class="b new">NEW</span>':''}
+      ${dd?`<span class="dday ${n!==null&&n>=0&&n<=3?'hot':''}">${dd}</span>`:''}
+    </div>
+    <h3>${esc(x.title)}</h3>
+    <div class="meta">${[x.proposer,x.org,x.field].filter(Boolean).map(esc).join(' · ')}</div>
+    <div class="tags">${(x.categories||[]).map(c=>`<span class="tag" style="background:${color(c)}">${esc(c)}</span>`).join('')}</div>
+    ${s?.oneline?`<div class="one">${esc(s.oneline)}</div>`:''}
+    <div class="more">
+      ${s?.reason?`<h4>개정 이유</h4><p>${esc(s.reason)}</p>`:''}
+      ${s?.points?.length?`<h4>주요 내용</h4><ul>${s.points.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`:''}
+      ${s?.impact?`<h4>영향 · 시사점</h4><p>${esc(s.impact)}</p>`:''}
+      ${x.body?`<h4>원문 발췌</h4><div class="raw">${esc(x.body)}</div>`:''}
+      <p class="meta" style="margin-top:10px">예고기간 ${esc(x.start||'-')} ~ ${esc(x.end||'-')} · 수집 ${esc(x.first_seen||'')}</p>
+    </div>
+    <div class="actions">
+      <button class="btn" data-toggle>자세히 보기</button>
+      <a class="btn primary" href="${esc(x.link)}" target="_blank" rel="noopener">원문 · 의견제출 ↗</a>
+    </div>
+  </article>`;
+}
+</script>
+</body>
+</html>
