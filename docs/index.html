@@ -1,0 +1,57 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>에너지 입법예고 워치</title>
+<style>
+body{font-family:system-ui,'Pretendard','Malgun Gothic',sans-serif;max-width:1000px;margin:auto;padding:16px;background:#f7f8fa;color:#222}
+h1{margin-bottom:4px}
+.chips button{margin:3px;padding:6px 12px;border-radius:16px;border:1px solid #ccc;background:#fff;cursor:pointer}
+.chips button.on{background:#0a6;color:#fff;border-color:#0a6}
+.card{background:#fff;border-radius:10px;padding:14px 16px;margin:10px 0;box-shadow:0 1px 3px #0001}
+.card h3{margin:8px 0 4px;font-size:17px}.card a{color:#1a4fa0;text-decoration:none}
+.tag{font-size:12px;background:#e8f5ee;color:#075;padding:2px 8px;border-radius:10px;margin-right:4px}
+.new{background:#e33;color:#fff}.src{background:#eef;color:#336}.end{opacity:.5}
+.meta{color:#666;font-size:13px}.sum{white-space:pre-wrap;margin-top:8px;line-height:1.6}
+input,select{padding:8px;margin:4px 4px 4px 0;border:1px solid #ccc;border-radius:6px}
+</style></head><body>
+<h1>⚡ 에너지 입법예고 워치</h1>
+<div class="meta" id="upd"></div>
+<div><input id="q" placeholder="검색 (법령명, 부처, 위원회…)" size="30">
+<select id="src"><option value="">전체 출처</option><option>국회</option><option>정부</option></select>
+<select id="st"><option value="진행">진행중</option><option value="">전체</option><option value="종료">종료</option></select></div>
+<div class="chips" id="chips"></div>
+<div id="list">불러오는 중…</div>
+<script>
+let data=[],cat='';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isNew=s=>s&&(Date.now()-new Date(s.replace(' ','T')+':00+09:00'))/864e5<3;
+Promise.all([fetch('data/bills.json',{cache:'no-store'}).then(r=>r.json()),
+             fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json())])
+.then(([d,m])=>{
+  data=d;
+  $('upd').textContent='마지막 수집: '+m.updated+(m.sources&&m.sources.length?' (성공: '+m.sources.join(', ')+')':'');
+  const cats=[...new Set(d.flatMap(x=>x.categories||[]))];
+  $('chips').innerHTML=['전체',...cats].map(c=>{
+    const v=c==='전체'?'':c, n=v?d.filter(x=>(x.categories||[]).includes(v)).length:d.length;
+    return `<button data-c="${esc(v)}">${esc(c)} (${n})</button>`}).join('');
+  $('chips').onclick=e=>{if(e.target.dataset.c!==undefined){cat=e.target.dataset.c;render()}};
+  ['q','src','st'].forEach(i=>$(i).oninput=render);
+  render();
+}).catch(()=>{$('list').textContent='데이터를 불러오지 못했습니다.'});
+function render(){
+  const q=$('q').value.trim(),s=$('src').value,st=$('st').value;
+  document.querySelectorAll('.chips button').forEach(b=>b.classList.toggle('on',b.dataset.c===cat));
+  const rows=data.filter(x=>(!cat||(x.categories||[]).includes(cat))&&(!s||x.source===s)&&(!st||x.status===st)
+    &&(!q||[x.title,x.proposer,x.org,x.field].join(' ').includes(q)));
+  $('list').innerHTML=rows.map(x=>`
+  <div class="card ${x.status==='종료'?'end':''}">
+    ${isNew(x.first_seen)?'<span class="tag new">NEW</span>':''}<span class="tag src">${esc(x.source)}</span>
+    ${(x.categories||[]).map(c=>`<span class="tag">${esc(c)}</span>`).join('')}
+    <h3><a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}</a></h3>
+    <div class="meta">${esc(x.proposer)}${x.org?' · '+esc(x.org):''}${x.field?' · '+esc(x.field):''}
+      · 예고기간 ${esc(x.start)} ~ ${esc(x.end)} · 수집 ${esc(x.first_seen)}</div>
+    ${x.summary?`<div class="sum">🤖 ${esc(x.summary)}</div>`:''}
+    ${x.body?`<details><summary>개정이유·주요내용 원문</summary><div class="sum">${esc(x.body)}</div></details>`:''}
+  </div>`).join('')||'<p>해당 건이 없습니다.</p>';
+}
+</script></body></html>
