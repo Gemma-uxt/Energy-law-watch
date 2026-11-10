@@ -6,7 +6,9 @@ const DATA = 'docs/data/bills.json';
 const META = 'docs/data/meta.json';
 const NEWF = 'docs/data/new.json';
 const ASSEMBLY_KEY = (process.env.ASSEMBLY_API_KEY || '').trim();
-const ANTHROPIC_KEY = (process.env.ANTHROPIC_API_KEY || '').trim();
+const GEMINI_KEY = (process.env.GEMINI_API_KEY || '').trim();
+const GEMINI_MODEL = (process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite').trim();
+const AI_MAX = 40; // 한 번 실행에 요약할 최대 건수 (무료 한도 보호)
 const GOV = 'https://opinion.lawmaking.go.kr';
 const UA = { 'User-Agent': 'Mozilla/5.0 (energy-law-watch)' };
 const NOW = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 16).replace('T', ' ');
@@ -55,7 +57,7 @@ function classify(text = '') {
     .map(([c]) => c);
 }
 
-// ---------- 국회: 진행중 입법예고 (열린국회정보 API) ----------
+// ---------- 국회: 진행중 입법예고 ----------
 async function fetchAssembly() {
   if (!ASSEMBLY_KEY) { console.log('[국회] ASSEMBLY_API_KEY 없음, 건너뜀'); return []; }
   const code = 'nknalejkafmvgzmpt';
@@ -72,16 +74,11 @@ async function fetchAssembly() {
   }
   console.log(`[국회] 진행중 입법예고 ${rows.length}건`);
   return rows.map((r) => ({
-    id: `NA-${r.BILL_ID}`,
-    source: '국회',
-    title: r.BILL_NAME || '',
-    proposer: r.PROPOSER || '',
-    org: r.CURR_COMMITTEE || '',
-    field: '',
-    start: '',
-    end: r.NOTI_ED_DT || '',
-    link: r.LINK_URL || '',
-    bill_id: r.BILL_ID || '',
+    id: `NA-${r.BILL_ID}`, source: '국회',
+    title: r.BILL_NAME || '', proposer: r.PROPOSER || '',
+    org: r.CURR_COMMITTEE || '', field: '',
+    start: '', end: r.NOTI_ED_DT || '',
+    link: r.LINK_URL || '', bill_id: r.BILL_ID || '',
   }));
 }
 
@@ -90,14 +87,15 @@ async function fetchAssemblyBody(item) {
   if (item.bill_id) urls.push(`https://likms.assembly.go.kr/bill/billDetail.do?billId=${item.bill_id}`);
   for (const u of urls.filter(Boolean)) {
     try {
-       const m = htmlToText(await get(u)).match(/제안이유[\s\S]{30,4000}?(?=의견제출 방법|의견등록|입법예고 목록보기|$)/);
+      const m = htmlToText(await get(u))
+        .match(/제안이유[\s\S]{30,4000}?(?=의견제출 방법|의견등록|입법예고 목록보기|$)/);
       if (m) return m[0].slice(0, 4000).trim();
     } catch {}
   }
   return '';
 }
 
-// ---------- 정부: 국민참여입법센터 (부처)입법예고 목록 페이지 ----------
+// ---------- 정부: 국민참여입법센터 목록 페이지 ----------
 async function fetchGov(maxPages = 15) {
   const out = [];
   const seen = new Set();
@@ -111,18 +109,15 @@ async function fetchGov(maxPages = 15) {
       seen.add(m[1]);
       const tds = [...tr.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((x) => clean(x[1]));
       const tm = tr.match(/title="([^"]+)"/);
-      const orgKind = tds[2] || '';                       // 예: 국토교통부 (대통령령)
+      const orgKind = tds[2] || '';
       const km = orgKind.match(/^(.*?)\s*\((.*?)\)\s*$/);
       const period = (tds[4] || '').match(/\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\./g) || [];
       out.push({
-        id: `GOV-${m[1]}`,
-        source: '정부',
+        id: `GOV-${m[1]}`, source: '정부',
         title: tm ? decode(tm[1]) : (tds[1] || ''),
-        proposer: km ? km[1] : orgKind,
-        org: km ? km[2] : '',
+        proposer: km ? km[1] : orgKind, org: km ? km[2] : '',
         field: tds[3] || '',
-        start: period[0] || '',
-        end: period[1] || '',
+        start: period[0] || '', end: period[1] || '',
         link: `${GOV}/gcom/ogLmPp/${m[1]}`,
       });
       added++;
@@ -143,33 +138,48 @@ async function fetchGovBody(item) {
   } catch { return ''; }
 }
 
-// ---------- (선택) Claude 요약 ----------
+// ---------- Gemini 요약 (무료 등급) ----------
+let aiCalls = 0;
 async function summarize(item) {
-  if (!ANTHROPIC_KEY || !item.body) return '';
-  try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        messages: [{ role: 'user', content:
-          '다음 법안을 에너지 업계 실무자 관점에서 3문장으로 요약해줘. ' +
-          '핵심 변경사항과 영향받는 주체 위주로, 불릿 없이.\n\n' +
-          `제목: ${item.title}\n\n${item.body}` }],
-      }),
-    });
-    const j = await r.json();
-    if (j.error) throw new Error(j.error.message);
-    return (j.content?.[0]?.text || '').trim();
-  } catch (e) {
-    console.log('  ! 요약 실패:', e.message);
-    return '';
+  if (!GEMINI_KEY || !item.body || aiCalls >= AI_MAX) return null;
+  aiCalls++;
+  const prompt =
+`너는 에너지 분야 법률 분석가야. 아래 입법예고 원문을 읽고 JSON으로만 답해.
+형식:
+{"oneline":"핵심을 담은 한 문장(60자 이내)",
+ "reason":"개정(제정) 이유를 2~3문장으로",
+ "points":["주요 내용을 항목별로, 각 50자 이내, 최대 5개"],
+ "impact":"영향받는 주체(발전사·판매사·소비자·지자체 등)와 실무상 시사점 1~2문장"}
+원문에 없는 내용은 절대 지어내지 마.
+
+제목: ${item.title}
+원문:
+${item.body}`;
+  for (let i = 1; i <= 3; i++) {
+    try {
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+        {
+          method: 'POST',
+          headers: { 'x-goog-api-key': GEMINI_KEY, 'content-type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+          }),
+        });
+      if (r.status === 429) { console.log('  ! Gemini 한도 초과, 잠시 대기'); await sleep(30000 * i); continue; }
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message);
+      const text = (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
+      const s = JSON.parse(text.replace(/^\s*```(json)?/, '').replace(/```\s*$/, ''));
+      await sleep(4000);
+      return s;
+    } catch (e) {
+      console.log(`  ! 요약 실패(${i}/3): ${e.message}`);
+      await sleep(3000);
+    }
   }
+  return null;
 }
 
 // ---------- 실행 ----------
@@ -199,6 +209,10 @@ for (const it of fetched) {
   const prev = old.get(it.id);
   if (prev) {
     for (const [k, v] of Object.entries(it)) if (v) prev[k] = v;
+    if (!prev.summary && prev.body) {           // 요약 없는 기존 건 채우기
+      const s = await summarize(prev);
+      if (s) { prev.summary = s; console.log(`  요약 추가: ${prev.title}`); }
+    }
     continue;
   }
   it.body = it.source === '국회' ? await fetchAssemblyBody(it) : await fetchGovBody(it);
@@ -210,7 +224,6 @@ for (const it of fetched) {
   await sleep(500);
 }
 
-// 진행/종료 판정: 종료일이 있으면 날짜로, 없으면 목록에 남아 있는지로
 for (const v of old.values()) {
   const end = toISO(v.end);
   if (end) v.status = end < TODAY ? '종료' : '진행';
@@ -223,4 +236,4 @@ const list = [...old.values()].sort((a, b) => (b.first_seen || '').localeCompare
 fs.writeFileSync(DATA, JSON.stringify(list, null, 1));
 fs.writeFileSync(META, JSON.stringify({ updated: NOW, sources: [...ok] }));
 fs.writeFileSync(NEWF, JSON.stringify(newItems, null, 1));
-console.log(`신규 ${newItems.length}건 / 누적 ${old.size}건`);
+console.log(`신규 ${newItems.length}건 / 누적 ${old.size}건 / AI 요약 ${aiCalls}회`);
