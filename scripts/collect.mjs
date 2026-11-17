@@ -1,5 +1,6 @@
 // 에너지 관련 입법예고 수집기 (GitHub Actions에서 실행됨)
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const KW = JSON.parse(fs.readFileSync('scripts/keywords.json', 'utf8'));
 const DATA = 'docs/data/bills.json';
@@ -182,6 +183,64 @@ async function fetchAdm(maxPages = 10) {
   console.log(`[행정규칙] 진행중 행정예고 ${out.length}건`);
   return out;
 }
+// ---------- 부처 홈페이지 행정예고 게시판 (관보 미게재분) ----------
+const BOARDS = fs.existsSync('scripts/boards.json')
+  ? JSON.parse(fs.readFileSync('scripts/boards.json', 'utf8')) : [];
+const addDays = (iso, d) => new Date(Date.parse(iso) + d * 864e5).toISOString().slice(0, 10);
+
+async function fetchBoards() {
+  const out = [];
+  for (const b of BOARDS) {
+    let n = 0;
+    try {
+      const html = await get(b.url);
+      const re = new RegExp(b.link, 'i');
+      const blocks = html.match(/<tr[\s\S]*?<\/tr>/gi) || html.match(/<li[\s\S]*?<\/li>/gi) || [];
+      const seen = new Set();
+      for (const blk of blocks) {
+        const a = (blk.match(/<a\b[^>]*>[\s\S]*?<\/a>/gi) || []).find((x) => re.test(x));
+        if (!a) continue;
+        const href = decode((a.match(/href="([^"]+)"/i) || [])[1] || '');
+        if (!href || href.startsWith('#') || /^javascript/i.test(href)) continue;
+        const link = new URL(href, b.url).href
+          .replace(/;jsessionid=[^?#]*/i, '').replace(/([?&])pageIndex=\d+&?/, '$1');
+        if (seen.has(link)) continue;
+        seen.add(link);
+        const dm = clean(blk).match(/(20\d{2})[-.]\s*(\d{1,2})[-.]\s*(\d{1,2})/);
+        const posted = dm ? `${dm[1]}-${dm[2].padStart(2, '0')}-${dm[3].padStart(2, '0')}` : '';
+        if (posted && (Date.parse(TODAY) - Date.parse(posted)) / 864e5 > (b.days || 45)) continue;
+        const title = clean(a).replace(/\s*(새\s*창|새창열림|첨부파일).*$/, '').trim();
+        if (title.length < 5) continue;
+        out.push({
+          id: 'MIN-' + createHash('md5').update(link).digest('hex').slice(0, 12),
+          source: '부처', title, proposer: b.name, org: '행정예고(부처 게시판)',
+          field: b.cat || '', start: posted, end: '', posted, link,
+        });
+        n++;
+      }
+    } catch (e) { console.log(`  ! [부처] ${b.name} 실패: ${e.message}`); }
+    console.log(`[부처] ${b.name}: ${n}건`);
+    await sleep(1000);
+  }
+  return out;
+}
+
+async function fetchBoardBody(item) {
+  try {
+    const t = htmlToText(await get(item.link));
+    const dl = t.match(/(20\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*까지/);
+    item.end = dl ? `${dl[1]}-${dl[2].padStart(2, '0')}-${dl[3].padStart(2, '0')}`
+      : (item.posted ? addDays(item.posted, 20) : '');
+    const m = t.match(/((제정|개정|폐지)\s*(이유|사유)|주요\s*내용)[\s\S]{30,5000}?(?=의견\s*제출|$)/);
+    if (m) return m[0].slice(0, 4000).trim();
+    const i = t.indexOf('행정절차법');
+    return i >= 0 ? t.slice(Math.max(0, i - 300), i + 2500).trim() : '';
+  } catch { return ''; }
+}
+
+// 제목 비교용(중복 제거)
+const normT = (s) => (s || '').replace(/[^가-힣A-Za-z0-9]/g, '')
+  .replace(/행정예고|입법예고|일부개정|전부개정|개정|제정|폐지|고시|훈령|예규|지침/g, '').replace(/안$/, '');
 
 // ---------- Gemini 요약 (무료 등급) ----------
 let aiCalls = 0;
@@ -235,7 +294,7 @@ if (fs.existsSync(DATA)) {
 
 let fetched = [];
 const ok = new Set();
-for (const [name, fn] of [['국회', fetchAssembly], ['정부', fetchGov], ['행정규칙', fetchAdm]]) {
+for (const [name, fn] of [['국회', fetchAssembly], ['정부', fetchGov], ['행정규칙', fetchAdm], ['부처', fetchBoards]]) {
   try {
     const items = await fn();
     fetched = fetched.concat(items);
@@ -244,6 +303,12 @@ for (const [name, fn] of [['국회', fetchAssembly], ['정부', fetchGov], ['행
     console.log(`[${name}] 수집 실패 → 기존 데이터 유지: ${e.message}`);
   }
 }
+
+const govKeys = [...fetched, ...old.values()]
+  .filter((x) => x.source === '정부' || x.source === '행정규칙').map((x) => normT(x.title));
+const isDup = (t) => { const k = normT(t).slice(0, 12); return k.length >= 6 && govKeys.some((g) => g.includes(k)); };
+for (const [id, v] of old) if (v.source === '부처' && isDup(v.title)) old.delete(id);
+fetched = fetched.filter((x) => x.source !== '부처' || !isDup(x.title));
 
 const current = new Set();
 const newItems = [];
@@ -260,7 +325,8 @@ for (const it of fetched) {
     }
     continue;
   }
-  it.body = it.source === '국회' ? await fetchAssemblyBody(it) : await fetchGovBody(it);
+  it.body = it.source === '국회' ? await fetchAssemblyBody(it)
+    : it.source === '부처' ? await fetchBoardBody(it) : await fetchGovBody(it);
   cats = [...new Set([...cats, ...classify(it.body)])].sort();
   Object.assign(it, { categories: cats, summary: await summarize(it), first_seen: NOW });
   old.set(it.id, it);
