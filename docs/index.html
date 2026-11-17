@@ -35,6 +35,7 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .top{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .b{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px}
 .b.na{background:#dbeafe;color:#1d4ed8}.b.gov{background:#d1fae5;color:#047857}.b.new{background:#fee2e2;color:#b91c1c}
+.b.adm{background:#ede9fe;color:#6d28d9}
 .dday{margin-left:auto;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;background:var(--chip);color:var(--sub)}
 .dday.hot{background:#dc2626;color:#fff}
 .card h3{margin:0;font-size:17px;line-height:1.45;letter-spacing:-.3px}
@@ -67,7 +68,7 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
   <div class="toolbar">
     <input class="search" id="q" placeholder="법령명, 부처, 위원회, 요약 내용 검색">
     <div class="seg" id="src">
-      <button data-v="" class="on">전체</button><button data-v="국회">국회</button><button data-v="정부">정부</button>
+      <button data-v="" class="on">전체</button><button data-v="국회">국회</button><button data-v="정부">정부</button><button data-v="행정규칙">행정규칙</button>
     </div>
     <select id="status"><option value="진행">진행중</option><option value="">전체</option><option value="종료">종료</option></select>
     <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option></select>
@@ -121,7 +122,7 @@ function render(){
     [live.length,'진행 중인 입법예고'],
     [data.filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
     [live.filter(x=>{const n=dday(x);return n!==null&&n<=7}).length,'7일 내 의견마감'],
-    [`${na} / ${live.length-na}`,'국회 / 정부']
+    [`${na} / ${live.filter(x=>x.source==='정부').length} / ${live.filter(x=>x.source==='행정규칙').length}`,'국회 / 정부 / 행정규칙']
   ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
 
   const rows=base();
@@ -140,7 +141,7 @@ function card(x){
   const dd=n===null?'':n<0?'마감':n===0?'D-DAY':'D-'+n;
   return `<article class="card ${x.status==='종료'?'ended':''}">
     <div class="top">
-      <span class="b ${x.source==='국회'?'na':'gov'}">${esc(x.source)}</span>
+      <span class="b ${x.source==='국회'?'na':x.source==='행정규칙'?'adm':'gov'}">${esc(x.source)}</span>
       ${age(x.first_seen)<3?'<span class="b new">NEW</span>':''}
       ${dd?`<span class="dday ${n!==null&&n>=0&&n<=3?'hot':''}">${dd}</span>`:''}
     </div>
