@@ -133,9 +133,54 @@ async function fetchGov(maxPages = 15) {
 async function fetchGovBody(item) {
   try {
     const t = htmlToText(await get(item.link));
-    const m = t.match(/(개정이유|제정이유)[\s\S]{30,5000}?(?=의견제출|$)/);
+    // 목록에서 잘린 제목(...)을 상세 페이지의 전체 제목으로 복원
+    if (/(\.\.\.|…)$/.test(item.title)) {
+      const p = item.title.replace(/(\.\.\.|…)$/, '').trim();
+      const full = t.split('\n').map((s) => s.trim()).find((s) => s.startsWith(p) && s.length > p.length);
+      if (full) item.title = full.slice(0, 200);
+    }
+    const m = t.match(/((제정|개정|폐지)\s*(이유|사유)|주요\s*내용)[\s\S]{30,5000}?(?=의견\s*제출|$)/);
     return m ? m[0].slice(0, 4000).trim() : '';
   } catch { return ''; }
+}
+
+// ---------- 정부: (부처)행정예고 = 고시·훈령·예규·지침 ----------
+async function fetchAdm(maxPages = 10) {
+  const out = [];
+  const seen = new Set();
+  for (let page = 1; page <= maxPages; page++) {
+    const html = await get(`${GOV}/gcom/admpp?pageIndex=${page}`);
+    const rows = html.match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    let found = 0, live = 0;
+    for (const tr of rows) {
+      const m = tr.match(/\/gcom\/admpp\/(\d+)([^"'\s]*)/);
+      if (!m || seen.has(m[1])) continue;
+      seen.add(m[1]);
+      found++;
+      const tds = [...tr.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((x) => clean(x[1]));
+      const period = (tds[4] || '').match(/\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\./g) || [];
+      const end = period[1] || '';
+      if (end && toISO(end) < TODAY) continue;   // 이미 끝난 예고는 건너뜀
+      live++;
+      const tm = tr.match(/title="([^"]+)"/);
+      const title = (tm ? decode(tm[1]) : (tds[1] || ''))
+        .replace(/\s*이동$/, '').replace(/^(진행|종료|마감)\s*/, '').trim();
+      const om = (tds[3] || '').match(/^(.*?)\s*\((.*?)\)\s*$/);
+      const query = decode(m[2]).replace(/[&?]pageIndex=\d+/, '');
+      out.push({
+        id: `ADM-${m[1]}`, source: '행정규칙',
+        title, proposer: om ? om[1] : (tds[3] || ''),
+        org: tds[2] || '', field: om ? om[2] : '',
+        start: period[0] || '', end,
+        link: `${GOV}/gcom/admpp/${m[1]}${query}`,
+      });
+    }
+    console.log(`[행정규칙] ${page}페이지: 진행 ${live}건`);
+    if (!found || !live) break;
+    await sleep(1000);
+  }
+  console.log(`[행정규칙] 진행중 행정예고 ${out.length}건`);
+  return out;
 }
 
 // ---------- Gemini 요약 (무료 등급) ----------
@@ -190,7 +235,7 @@ if (fs.existsSync(DATA)) {
 
 let fetched = [];
 const ok = new Set();
-for (const [name, fn] of [['국회', fetchAssembly], ['정부', fetchGov]]) {
+for (const [name, fn] of [['국회', fetchAssembly], ['정부', fetchGov], ['행정규칙', fetchAdm]]) {
   try {
     const items = await fn();
     fetched = fetched.concat(items);
@@ -208,7 +253,7 @@ for (const it of fetched) {
   current.add(it.id);
   const prev = old.get(it.id);
   if (prev) {
-    for (const [k, v] of Object.entries(it)) if (v) prev[k] = v;
+    for (const [k, v] of Object.entries(it)) if (v && !(k === 'title' && /(\.\.\.|…)$/.test(v))) prev[k] = v;
     if (!prev.summary && prev.body) {           // 요약 없는 기존 건 채우기
       const s = await summarize(prev);
       if (s) { prev.summary = s; console.log(`  요약 추가: ${prev.title}`); }
