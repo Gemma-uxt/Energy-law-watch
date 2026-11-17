@@ -1,21 +1,16 @@
 [
-  {
-    "name": "산업통상부",
-    "url": "https://www.motir.go.kr/kor/article/ATCLa6723dc7b",
-    "link": "ATCLa6723dc7b/\\d+/view",
-    "days": 45
-  },
-  {
-    "name": "기후에너지환경부",
-    "url": "https://www.mcee.go.kr/home/web/board/list.do?menuId=10557&boardMasterId=827",
-    "link": "board/read\\.do",
-    "days": 45
-  },
-  {
-    "name": "원자력안전위원회",
-    "url": "https://www.nssc.go.kr/ko/cms/FR_BBS_CON/BoardList.do?MENU_ID=980&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=22",
-    "link": "BoardView\\.do[^\"']*BBS_SEQ=\\d+",
-    "days": 45,
-    "cat": "원자력"
-  }
+  { "name": "산업통상부", "url": "https://www.motir.go.kr/kor/article/ATCLa6723dc7b",
+    "link": "ATCLa6723dc7b/\\d+/view", "days": 45 },
+  { "name": "기후에너지환경부", "url": "https://www.mcee.go.kr/home/web/board/list.do?menuId=10557&boardMasterId=827",
+    "link": "board/read\\.do", "days": 45 },
+  { "name": "원자력안전위원회", "url": "https://www.nssc.go.kr/ko/cms/FR_BBS_CON/BoardList.do?MENU_ID=980&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=22",
+    "link": "BoardView\\.do.{0,80}?BBS_SEQ=\\d+", "days": 45, "cat": "원자력" },
+  { "name": "국토교통부", "url": "https://www.molit.go.kr/USR/law/m_46/lst.jsp",
+    "link": "dtl\\.jsp\\?r_id=\\d+", "period": true, "pages": 3, "pageParam": "lcmspage", "days": 45 },
+  { "name": "전력거래소", "kind": "전력시장운영규칙 개정 공고",
+    "url": "https://www.kpx.or.kr/board.es?mid=a10205010000&bid=0030",
+    "link": "act=view.{0,40}?list_no=\\d+", "days": 60, "cat": "전기·전력", "noDeadline": true },
+  { "name": "전력거래소", "kind": "규칙개정위원회 심의결과",
+    "url": "https://www.kpx.or.kr/board.es?mid=a10102090000&bid=0095",
+    "link": "act=view.{0,40}?list_no=\\d+", "only": "규칙개정", "days": 60, "cat": "전기·전력", "noDeadline": true }
 ]
