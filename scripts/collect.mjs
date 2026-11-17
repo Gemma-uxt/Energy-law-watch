@@ -726,6 +726,7 @@ fetched = fetched.filter((x) => {
 const SKIP = KW.skip || {};
 const offTopic = (x) => {
   const t = x.title || '';
+  if ((SKIP.drop || []).some((w) => t.includes(w))) return true;   // 무조건 제외(수수료·가스시설 안전·광물 등)
   return (SKIP.title || []).some((w) => t.includes(w)) && !(SKIP.unless || []).some((w) => t.includes(w));
 };
 fetched = fetched.filter((x) => !offTopic(x));
