@@ -340,14 +340,15 @@ async function summarize(item) {
  "importance_reason":"중요도 판단 근거 1문장",
  "watch":"실무자가 지금 확인하거나 준비할 점 1문장"${PROFILE ? `,
  "fit":"아래 '우리 관점'에서 본 영향 1문장 (관련이 적으면 '직접 관련 낮음')"` : ''}}
-원문에 없는 내용은 지어내지 말고, 알 수 없으면 빈 값으로 둬.${PROFILE ? `\n\n우리 관점: ${PROFILE}` : ''}
+원문에 없는 내용은 지어내지 말고, 알 수 없으면 빈 값으로 둬.
+direction 판단 기준: 규제받는 대상(사업자·기관·국민)의 의무·제한이 늘거나 엄격해지면 '규제강화', 줄거나 느슨해지면 '규제완화'. 온도·수치 기준은 대상이 더 자유롭게 행동할 수 있게 바뀌면 완화(예: 냉방 28℃→26℃, 난방 18℃→20℃는 완화). 강화와 완화가 섞이면 비중이 큰 쪽을 고르고, importance_reason에 섞여 있다고 적을 것.${PROFILE ? `\n\n우리 관점: ${PROFILE}` : ''}
 
 제목: ${item.title}
 원문:
 ${item.body}`;
   const s = await gemini(prompt);
   if (s) {
-    s.v = 2;
+    s.v = 3;
     s.importance = Math.min(3, Math.max(1, parseInt(s.importance, 10) || 1));
     if (!Array.isArray(s.who)) s.who = [];
     if (!Array.isArray(s.points)) s.points = s.points ? [String(s.points)] : [];
