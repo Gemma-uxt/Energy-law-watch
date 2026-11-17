@@ -90,12 +90,35 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .hotl .btn{flex:none;padding:6px 12px;font-size:12px}
 footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.grid,.ins{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}header h1{font-size:24px}}
+.what{margin-top:18px;background:#ffffff1f;border:1px solid #ffffff38;border-radius:14px;padding:14px 18px}
+.what p{margin:0 0 10px;opacity:1;font-size:14.5px}
+.what .road{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px}
+.what .road span{background:#ffffff26;padding:4px 11px;border-radius:999px}
+.what .road span.here{background:#fff;color:#0f766e;font-weight:700}
+.what .road i{font-style:normal;opacity:.6}
+.what .paths{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.what .paths div{background:#00000029;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5}
+.what .paths b{display:block;font-size:13.5px}
+@media(max-width:760px){.what .paths{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <h1>⚡ 에너지 입법예고 워치</h1>
   <p>국회·정부 입법·행정예고 중 탈탄소·전력·집단에너지·재생에너지 관련 건을 자동 수집·분석합니다 · <span id="upd">불러오는 중…</span></p>
+  <div class="what">
+    <p>📌 <b>입법예고란?</b> 법령을 만들거나 고치기 전에 초안을 공개하고 의견을 받는 절차입니다. <b>확정된 법이 아니라 '초안 공개' 단계</b>예요.</p>
+    <div class="road">
+      <span>초안 작성</span><i>→</i><span class="here">📍 입법·행정예고 (의견 접수)</span><i>→</i>
+      <span>심사·수정</span><i>→</i><span>의결·승인</span><i>→</i><span>공포·시행</span>
+    </div>
+    <div class="paths">
+      <div><b>국회 법률안</b>상임위·법사위·본회의가 남아 통과가 불확실해요. 정치권의 관심 신호로 보세요.</div>
+      <div><b>정부 법률안</b>정부 방향은 정해졌지만 국회 통과가 남았어요. 대개 1년 안팎 이상 걸려요.</div>
+      <div><b>시행령·시행규칙</b>국회를 거치지 않아 보통 수개월 안에 확정돼요. 실무 준비 신호예요.</div>
+      <div><b>고시·훈령</b>부처가 자체 결정해 가장 빨리 시행돼요. 의견을 낼 마지막 기회예요.</div>
+    </div>
+  </div>
 </div></header>
 
 <main class="wrap">
