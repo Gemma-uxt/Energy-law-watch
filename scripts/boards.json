@@ -9,8 +9,6 @@
     "link": "dtl\\.jsp\\?r_id=\\d+", "period": true, "pages": 3, "pageParam": "lcmspage", "days": 45 },
   { "name": "전력거래소", "kind": "전력시장운영규칙 개정 공고",
     "url": "https://www.kpx.or.kr/board.es?mid=a10205010000&bid=0030",
-    "link": "act=view.{0,40}?list_no=\\d+", "days": 60, "cat": "전기·전력", "noDeadline": true },
-  { "name": "전력거래소", "kind": "규칙개정위원회 심의결과",
-    "url": "https://www.kpx.or.kr/board.es?mid=a10102090000&bid=0095",
-    "link": "act=view.{0,40}?list_no=\\d+", "only": "규칙개정", "days": 60, "cat": "전기·전력", "noDeadline": true }
+    "link": "act=view.{0,40}?list_no=\\d+", "days": 60, "cat": "전기·전력",
+    "noDeadline": true, "lockCat": true }
 ]
