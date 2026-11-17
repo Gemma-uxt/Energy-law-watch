@@ -452,6 +452,11 @@ const govKeys = [...fetched, ...old.values()]
 const isDup = (t) => { const k = normT(t).slice(0, 12); return k.length >= 6 && govKeys.some((g) => g.includes(k)); };
 for (const [id, v] of old) if (v.source === '부처' && isDup(v.title)) old.delete(id);
 fetched = fetched.filter((x) => x.source !== '부처' || !isDup(x.title));
+// 이미 저장된 건 정리: 회의결과 삭제, 전력거래소 태그 바로잡기
+for (const [id, v] of old) {
+  if (v.org === '규칙개정위원회 심의결과') { old.delete(id); continue; }
+  if (v.proposer === '전력거래소') { v.lockCat = true; v.categories = [v.cat || '전기·전력']; }
+}
 
 const current = new Set();
 const newItems = [];
