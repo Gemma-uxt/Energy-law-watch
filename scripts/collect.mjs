@@ -454,6 +454,14 @@ for (const [id, v] of old) if (v.source === '부처' && isDup(v.title)) old.dele
 fetched = fetched.filter((x) => x.source !== '부처' || !isDup(x.title));
 // 전력거래소는 수집하지 않음 → 이미 저장된 건 삭제
 for (const [id, v] of old) if (v.proposer === '전력거래소') old.delete(id);
+// 에너지와 무관한 주제(AI·정보통신 등) 제외 → keywords.json의 skip에서 관리
+const SKIP = KW.skip || {};
+const offTopic = (x) => {
+  const t = x.title || '';
+  return (SKIP.title || []).some((w) => t.includes(w)) && !(SKIP.unless || []).some((w) => t.includes(w));
+};
+fetched = fetched.filter((x) => !offTopic(x));
+for (const [id, v] of old) if (offTopic(v)) { old.delete(id); console.log(`  제외(주제 무관): ${v.title}`); }
 
 const current = new Set();
 const newItems = [];
