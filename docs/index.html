@@ -110,6 +110,14 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 .bar{cursor:pointer}
 .bar:hover .stack{filter:brightness(1.12)}
 
+.stat{font:inherit;color:var(--text);text-align:left;cursor:pointer;width:100%;transition:transform .15s,border-color .15s}
+.stat:hover{transform:translateY(-2px);border-color:var(--brand)}
+.what .paths [data-go]{cursor:pointer;transition:background .15s}
+.what .paths [data-go]:hover{background:#00000052}
+.pre{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:9px 14px;background:var(--soft);border:1px solid #99f6e4;border-radius:10px;font-size:13.5px}
+.pre:empty{display:none}
+.pre button{margin-left:auto;border:0;background:none;color:var(--brand);font:inherit;font-weight:600;cursor:pointer}
+
 </style>
 </head>
 <body>
@@ -123,10 +131,11 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
       <span>심사·수정</span><i>→</i><span>의결·승인</span><i>→</i><span>공포·시행</span>
     </div>
     <div class="paths">
-      <div><b>국회 법률안</b>상임위·법사위·본회의가 남아 통과가 불확실해요. 정치권의 관심 신호로 보세요.</div>
-      <div><b>정부 법률안</b>정부 방향은 정해졌지만 국회 통과가 남았어요. 대개 1년 안팎 이상 걸려요.</div>
-      <div><b>시행령·시행규칙</b>국회를 거치지 않아 보통 수개월 안에 확정돼요. 실무 준비 신호예요.</div>
-      <div><b>고시·훈령</b>부처가 자체 결정해 가장 빨리 시행돼요. 의견을 낼 마지막 기회예요.</div>
+    <div class="paths">
+      <div data-go="국회 법률안"><b>국회 법률안 →</b>상임위·법사위·본회의가 남아 통과가 불확실해요. 정치권의 관심 신호로 보세요.</div>
+      <div data-go="정부 법률안"><b>정부 법률안 →</b>정부 방향은 정해졌지만 국회 통과가 남았어요. 대개 1년 안팎 이상 걸려요.</div>
+      <div data-go="시행령·시행규칙"><b>시행령·시행규칙 →</b>국회를 거치지 않아 보통 수개월 안에 확정돼요. 실무 준비 신호예요.</div>
+      <div data-go="고시·훈령 등"><b>고시·훈령 →</b>부처가 자체 결정해 가장 빨리 시행돼요. 의견을 낼 마지막 기회예요.</div>
     </div>
   </div>
 </div></header>
@@ -145,6 +154,7 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
       <select id="status"><option value="진행">진행중</option><option value="">전체</option><option value="종료">종료</option></select>
       <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option><option value="imp">중요도순</option></select>
     </div>
+    <div class="pre" id="pre"></div>
     <div class="chips" id="chips"></div>
     <section class="grid" id="grid"><div class="empty">불러오는 중…</div></section>
   </div>
@@ -191,6 +201,28 @@ function tab(t){
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   $('#tab-list').hidden=t!=='list';$('#tab-ins').hidden=t!=='ins';
 }
+  
+const PRESET={
+  live:{label:'진행 중인 예고',status:'진행'},
+  new7:{label:'최근 7일 신규',status:'',f:x=>age(x.first_seen)<7,sort:'new'},
+  due7:{label:'7일 내 의견마감',status:'진행',f:x=>{const n=dday(x);return n!==null&&n>=0&&n<=7},sort:'due'},
+  soon:{label:'곧 확정될 하위법령·고시',status:'진행',f:x=>[1,2].includes(stg(x).order),sort:'due'}
+};
+function go(k){
+  const p=PRESET[k]||{status:'진행',stage:k};
+  Object.assign(st,{cat:'',src:'',q:'',stage:p.stage||'',status:p.status,sort:p.sort||st.sort,
+    extra:p.f||null,extraLabel:p.f?p.label:''});
+  $('#q').value='';$('#stage').value=st.stage;$('#status').value=st.status;$('#sort').value=st.sort;
+  [...$('#src').children].forEach(b=>b.classList.toggle('on',b.dataset.v===''));
+  tab('list');render();
+  $('.tabs').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){go(g.dataset.go);return}
+  if(e.target.closest('#preX')){st.extra=null;st.extraLabel='';render()}
+});
+
 function bind(){
   $('.tabs').onclick=e=>{const b=e.target.closest('button');if(b)tab(b.dataset.tab)};
   $('#q').oninput=e=>{st.q=e.target.value.trim();render()};
@@ -228,7 +260,7 @@ function bind(){
   $('#tab-ins').onmouseleave=()=>{$('#tip').style.display='none'};
 }
 
-function base(){return data.filter(x=>(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
+function base(){return data.filter(x=>(!st.extra||st.extra(x))&&(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
   &&(!st.stage||stg(x).label===st.stage)
   &&(!st.q||[x.title,x.proposer,x.org,x.field,x.law,sum(x)?.oneline,(sum(x)?.who||[]).join(' ')].join(' ').toLowerCase().includes(st.q.toLowerCase())))}
 
@@ -239,9 +271,10 @@ function render(){
     [data.filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
     [live.filter(x=>{const n=dday(x);return n!==null&&n>=0&&n<=7}).length,'7일 내 의견마감'],
     [live.filter(x=>[1,2].includes(stg(x).order)).length,'곧 확정될 하위법령·고시']
-  ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+  ].map(([b,s],i)=>`<button class="stat" data-go="${['live','new7','due7','soon'][i]}"><b>${b}</b><span>${s}</span></button>`).join('');
 
   const rows=base();
+    $('#pre').innerHTML=st.extra?`<span>📌 <b>${esc(st.extraLabel)}</b>만 보는 중</span><button id="preX">✕ 해제</button>`:'';
   const cats=Object.keys(COLORS).filter(c=>data.some(x=>(x.categories||[]).includes(c)));
   $('#chips').innerHTML=[['','전체',rows.length],...cats.map(c=>[c,c,rows.filter(x=>(x.categories||[]).includes(c)).length])]
     .map(([v,l,n])=>`<button class="chip ${st.cat===v?'on':''}" data-c="${esc(v)}" style="${st.cat===v?`background:${v?color(v):'#0f766e'}`:''}">${esc(l)}<i>${n}</i></button>`).join('');
