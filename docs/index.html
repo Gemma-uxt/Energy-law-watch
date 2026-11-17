@@ -37,14 +37,27 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .card.ended{opacity:.55}
 .top{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .b{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px}
-.b.na{background:#dbeafe;color:#1d4ed8}.b.gov{background:#d1fae5;color:#047857}.b.adm{background:#ede9fe;color:#6d28d9}.b.min{background:#fef3c7;color:#b45309}.b.new{background:#fee2e2;color:#b91c1c}
+.b.kpx{background:#cffafe;color:#0e7490}.b.na{background:#dbeafe;color:#1d4ed8}.b.gov{background:#d1fae5;color:#047857}.b.adm{background:#ede9fe;color:#6d28d9}.b.min{background:#fef3c7;color:#b45309}.b.new{background:#fee2e2;color:#b91c1c}
 .stage{font-size:12px;font-weight:600;padding:2px 9px;border-radius:6px;border:1px solid currentColor;cursor:help}
-.s0{color:#15803d}.s1{color:#0d9488}.s2{color:#2563eb}.s3{color:#9333ea}.s4{color:#64748b}
+.s0{color:#15803d}.s1{color:#0e7490}.s2{color:#0d9488}.s3{color:#2563eb}.s4{color:#9333ea}.s5{color:#64748b}
 .dday{margin-left:auto;font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;background:var(--chip);color:var(--sub)}
 .dday.hot{background:#dc2626;color:#fff}
 .card h3{margin:0;font-size:17px;line-height:1.45;letter-spacing:-.3px}
 .meta{font-size:13px;color:var(--sub)}
-.imp{color:#f59e0b;letter-spacing:1px;cursor:help}
+.star{border:0;background:none;cursor:pointer;font-size:18px;line-height:1;color:var(--sub);padding:0 2px}
+.star.on{color:#f59e0b}
+.card.watched{border-color:#f59e0b;box-shadow:0 0 0 1px #f59e0b inset}
+.prog{display:flex;gap:3px;align-items:center;font-size:12px;color:var(--sub)}
+.prog i{width:18px;height:6px;border-radius:3px;background:var(--chip)}
+.prog i.on{background:#2563eb}.prog.dead i.on{background:#94a3b8}
+.prog b{margin-left:6px;font-weight:600;color:var(--text)}
+.tool{border:1px solid var(--line);background:var(--card);color:var(--text);padding:11px 14px;border-radius:12px;cursor:pointer;font:inherit;font-size:14px;white-space:nowrap}
+.tool.on{background:#f59e0b;border-color:#f59e0b;color:#fff}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;z-index:60;display:none}
+.bar.partial .stack{opacity:.35;background-image:repeating-linear-gradient(45deg,#ffffff55 0 4px,transparent 4px 8px)}
+.bar.partial span{opacity:.6}
+.note{font-size:12px;color:var(--sub);background:var(--bg);border-radius:8px;padding:8px 11px;margin:-4px 0 12px}
+.hotl li small{display:block;color:var(--sub);margin:1px 0 0 2px}
 .tags{display:flex;flex-wrap:wrap;gap:4px}
 .tag{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;color:#fff}
 .who{font-size:11.5px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--sub)}
@@ -66,7 +79,7 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .brief h3{margin:4px 0 10px;font-size:19px;line-height:1.45}
 .brief h4{margin:14px 0 4px;font-size:13px;color:#0d9488}
 .brief ul{margin:0;padding-left:18px}.brief li{margin:3px 0;font-size:14px}
-.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pipe{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
 .step{border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:var(--bg)}
 .step:hover{border-color:var(--brand)}
 .step b{font-size:26px;display:block;margin-top:6px}
@@ -89,14 +102,15 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .hotl li{margin:4px 0}
 .hotl .btn{flex:none;padding:6px 12px;font-size:12px}
 footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
-@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.grid,.ins{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}header h1{font-size:24px}}
+@media(max-width:980px){.pipe{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.grid,.ins{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}header h1{font-size:24px}.grid{grid-template-columns:1fr}}
 .what{margin-top:18px;background:#ffffff1f;border:1px solid #ffffff38;border-radius:14px;padding:14px 18px}
 .what p{margin:0 0 10px;opacity:1;font-size:14.5px}
 .what .road{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px}
 .what .road span{background:#ffffff26;padding:4px 11px;border-radius:999px}
 .what .road span.here{background:#fff;color:#0f766e;font-weight:700}
 .what .road i{font-style:normal;opacity:.6}
-.what .paths{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.what .paths{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
 .what .paths div{background:#00000029;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5}
 .what .paths b{display:block;font-size:13.5px}
 @media(max-width:760px){.what .paths{grid-template-columns:1fr 1fr}}
@@ -123,7 +137,7 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 <body>
 <header><div class="wrap">
   <h1>⚡ 에너지 입법예고 워치</h1>
-  <p>국회·정부 입법·행정예고 중 탈탄소·전력·집단에너지·재생에너지 관련 건을 자동 수집·분석합니다 · <span id="upd">불러오는 중…</span></p>
+  <p>국회·정부 입법·행정예고와 전력시장 규칙 개정 중 탈탄소·전력·집단에너지·재생에너지 관련 건을 자동 수집·분석합니다 · <span id="upd">불러오는 중…</span> · <a href="feed.xml" style="color:#fff">RSS 구독</a></p>
   <div class="what">
     <p>📌 <b>입법예고란?</b> 법령을 만들거나 고치기 전에 초안을 공개하고 의견을 받는 절차입니다. <b>확정된 법이 아니라 '초안 공개' 단계</b>예요.</p>
     <div class="road">
@@ -135,6 +149,7 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
       <div data-go="정부 법률안"><b>정부 법률안 →</b>정부 방향은 정해졌지만 국회 통과가 남았어요. 대개 1년 안팎 이상 걸려요.</div>
       <div data-go="시행령·시행규칙"><b>시행령·시행규칙 →</b>국회를 거치지 않아 보통 수개월 안에 확정돼요. 실무 준비 신호예요.</div>
       <div data-go="고시·훈령 등"><b>고시·훈령 →</b>부처가 자체 결정해 가장 빨리 시행돼요. 의견을 낼 마지막 기회예요.</div>
+      <div data-go="전력시장 규칙 심의"><b>전력시장 규칙 →</b>규칙개정위·전기위원회 심의 후 장관 승인으로 1~2개월 안에 시행돼요.</div>
     </div>
   </div>
 </div></header>
@@ -147,11 +162,14 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
     <div class="toolbar">
       <input class="search" id="q" placeholder="법령명, 부처, 위원회, 요약, 영향 주체 검색">
       <div class="seg" id="src">
-        <button data-v="" class="on">전체</button><button data-v="국회">국회</button><button data-v="정부">정부</button><button data-v="행정규칙">행정규칙</button><button data-v="부처">부처·기관</button>
+        <button data-v="" class="on">전체</button><button data-v="국회">국회</button><button data-v="정부">정부</button><button data-v="행정규칙">행정규칙</button><button data-v="부처">부처·기관</button><button data-v="전력시장">전력시장</button>
       </div>
       <select id="stage"></select>
       <select id="status"><option value="진행">진행중</option><option value="">전체</option><option value="종료">종료</option></select>
-      <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option><option value="imp">중요도순</option></select>
+      <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option></select>
+      <button class="tool" id="watchOnly" title="☆를 눌러 등록한 법령만 보기">★ 관심 법령</button>
+      <button class="tool" id="share" title="지금 보고 있는 필터 그대로 열리는 링크 복사">🔗 링크 복사</button>
+      <button class="tool" id="csv" title="지금 목록을 엑셀에서 열 수 있는 CSV로 내려받기">⬇ 엑셀(CSV)</button>
     </div>
     <div class="pre" id="pre"></div>
     <div class="chips" id="chips"></div>
@@ -160,19 +178,26 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 
   <div id="tab-ins"></div>
   <div class="tip" id="tip"></div>
+  <div class="toast" id="toast"></div>
 </main>
-<footer>출처: 열린국회정보 · 국민참여입법센터 · 각 부처·기관 홈페이지 | 요약·분석·브리핑은 AI가 생성한 것으로, 정확한 내용은 원문을 확인하세요.</footer>
+<footer>출처: 열린국회정보 · 의안정보시스템 · 국민참여입법센터 · 각 부처·기관 홈페이지 · 전력거래소 · 전기위원회 | 요약·분석·브리핑은 AI가 생성한 것으로, 정확한 내용은 원문을 확인하세요. | <a href="feed.xml">RSS</a></footer>
 
 <script>
 const COLORS={"탈탄소·기후":"#16a34a","집단에너지·열":"#ea580c","전기·전력":"#2563eb","재생에너지·PPA":"#0d9488","원자력":"#7c3aed","수소":"#0891b2","가스·석유·자원":"#b45309","에너지 일반·효율":"#64748b"};
+// [단계, 속도, 설명] — 왼쪽일수록 빨리 현실이 됨
 const STAGES=[
+ ['확정·시행','이미 확정','전력시장 규칙 개정이 공고·시행됨'],
+ ['전력시장 규칙 심의','매우 빠름(1~2개월)','규칙개정위·전기위원회 심의 후 장관 승인'],
  ['고시·훈령 등','가장 빠름(수주~수개월)','국회 없이 부처가 확정·발령'],
  ['시행령·시행규칙','빠름(보통 수개월)','국회 의결 없이 국무회의 등으로 확정'],
  ['정부 법률안','중기(국회 심사 필요)','국무회의 후 국회 제출, 국회 통과가 남음'],
  ['국회 법률안','장기·불확실','통과가 불확실한 정치권 관심 신호']];
-const SRC={'국회':'na','정부':'gov','행정규칙':'adm','부처':'min'};
+const SOON=['전력시장 규칙 심의','고시·훈령 등','시행령·시행규칙'];
+const SRC={'국회':'na','정부':'gov','행정규칙':'adm','부처':'min','전력시장':'kpx'};
+const PROG=['접수','소관위','법사위','본회의','정부이송','공포'];
 const color=c=>COLORS[c]||'#475569';
-const st={cat:'',src:'',status:'진행',stage:'',sort:'new',q:''};
+const DEF={tab:'ins',cat:'',src:'',status:'진행',stage:'',sort:'new',q:'',watch:false,preset:''};
+const st={...DEF};
 let data=[],INS={};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -183,43 +208,69 @@ const age=s=>s?(Date.now()-new Date(s.replace(' ','T')+':00+09:00'))/864e5:999;
 const sum=x=>!x.summary?null:(typeof x.summary==='string'?{oneline:x.summary}:x.summary);
 const stg=x=>x.stage||{label:'',order:9};
 const srcName=s=>s==='부처'?'부처·기관':s;
+const md=s=>{const d=parseDate(s);return d?`${d.getMonth()+1}/${d.getDate()}`:''};
+
+// ---- 관심 법령 (이 브라우저에만 저장) ----
+let WATCH=[];
+try{WATCH=JSON.parse(localStorage.getItem('elw-watch')||'[]')}catch{}
+const saveWatch=()=>{try{localStorage.setItem('elw-watch',JSON.stringify(WATCH))}catch{}};
+const lawKey=x=>x.law||x.title;
+const isWatched=x=>WATCH.includes(lawKey(x));
+
+// ---- 주소(#)에 필터 상태 저장 → 링크로 공유 ----
+function readHash(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  for(const k of Object.keys(DEF)){if(h.has(k))st[k]=typeof DEF[k]==='boolean'?h.get(k)==='1':h.get(k)}
+}
+function writeHash(){
+  const h=new URLSearchParams();
+  for(const k of Object.keys(DEF)){const v=st[k];if(v!==DEF[k])h.set(k,typeof v==='boolean'?(v?'1':'0'):v)}
+  const str=h.toString();
+  history.replaceState(null,'',str?'#'+str:location.pathname+location.search);
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2200)}
 
 Promise.all([
   fetch('data/bills.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/insights.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(([d,m,ins])=>{
-    data=d.filter(x=>x.proposer!=='전력거래소').map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
+  data=d.map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
   INS=ins||{};
   $('#upd').textContent='마지막 수집 '+m.updated;
   $('#stage').innerHTML='<option value="">모든 단계</option>'+STAGES.map(s=>`<option>${s[0]}</option>`).join('');
-  bind();render();renderIns();
+  readHash();syncControls();bind();tab(st.tab);render();renderIns();
 }).catch(()=>{$('#grid').innerHTML='<div class="empty">데이터를 불러오지 못했습니다.</div>'});
 
+function syncControls(){
+  $('#q').value=st.q;$('#stage').value=st.stage;$('#status').value=st.status;$('#sort').value=st.sort;
+  [...$('#src').children].forEach(b=>b.classList.toggle('on',b.dataset.v===st.src));
+  $('#watchOnly').classList.toggle('on',st.watch);
+  $('#watchOnly').textContent=`★ 관심 법령${WATCH.length?` (${WATCH.length})`:''}`;
+}
 function tab(t){
+  st.tab=t;
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   $('#tab-list').hidden=t!=='list';$('#tab-ins').hidden=t!=='ins';
+  writeHash();
 }
-  
+
 const PRESET={
   live:{label:'진행 중인 예고',status:'진행'},
   new7:{label:'최근 7일 신규',status:'',f:x=>age(x.first_seen)<7,sort:'new'},
   due7:{label:'7일 내 의견마감',status:'진행',f:x=>{const n=dday(x);return n!==null&&n>=0&&n<=7},sort:'due'},
-  soon:{label:'곧 확정될 하위법령·고시',status:'진행',f:x=>[1,2].includes(stg(x).order),sort:'due'}
+  soon:{label:'곧 확정될 규칙·하위법령·고시',status:'진행',f:x=>SOON.includes(stg(x).label),sort:'due'}
 };
 function go(k){
   const p=PRESET[k]||{status:'진행',stage:k};
-  Object.assign(st,{cat:'',src:'',q:'',stage:p.stage||'',status:p.status,sort:p.sort||st.sort,
-    extra:p.f||null,extraLabel:p.f?p.label:''});
-  $('#q').value='';$('#stage').value=st.stage;$('#status').value=st.status;$('#sort').value=st.sort;
-  [...$('#src').children].forEach(b=>b.classList.toggle('on',b.dataset.v===''));
-  tab('list');render();
+  Object.assign(st,{cat:'',src:'',q:'',watch:false,stage:p.stage||'',status:p.status,sort:p.sort||st.sort,preset:PRESET[k]?k:''});
+  syncControls();tab('list');render();
   $('.tabs').scrollIntoView({behavior:'smooth',block:'start'});
 }
 document.addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');
   if(g){go(g.dataset.go);return}
-  if(e.target.closest('#preX')){st.extra=null;st.extraLabel='';render()}
+  if(e.target.closest('#preX')){st.preset='';render()}
 });
 
 function bind(){
@@ -228,25 +279,36 @@ function bind(){
   $('#status').onchange=e=>{st.status=e.target.value;render()};
   $('#stage').onchange=e=>{st.stage=e.target.value;render()};
   $('#sort').onchange=e=>{st.sort=e.target.value;render()};
-  $('#src').onclick=e=>{const b=e.target.closest('button');if(!b)return;st.src=b.dataset.v;
-    [...$('#src').children].forEach(x=>x.classList.toggle('on',x===b));render()};
+  $('#src').onclick=e=>{const b=e.target.closest('button');if(!b)return;st.src=b.dataset.v;syncControls();render()};
   $('#chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;st.cat=b.dataset.c;render()};
-  $('#grid').onclick=e=>{const b=e.target.closest('[data-toggle]');if(!b)return;
+  $('#watchOnly').onclick=()=>{
+    if(!WATCH.length&&!st.watch){toast('카드의 ☆를 눌러 관심 법령을 먼저 등록하세요');return}
+    st.watch=!st.watch;if(st.watch){st.status=''}syncControls();render()};
+  $('#share').onclick=async()=>{writeHash();
+    try{await navigator.clipboard.writeText(location.href);toast('지금 화면 그대로 열리는 링크를 복사했어요')}
+    catch{prompt('아래 링크를 복사하세요',location.href)}};
+  $('#csv').onclick=downloadCSV;
+  $('#grid').onclick=e=>{
+    const w=e.target.closest('[data-watch]');
+    if(w){const k=w.dataset.watch;WATCH=WATCH.includes(k)?WATCH.filter(v=>v!==k):[...WATCH,k];saveWatch();
+      toast(WATCH.includes(k)?`관심 법령에 추가: ${k}`:`관심 법령에서 뺌: ${k}`);syncControls();render();return}
+    const b=e.target.closest('[data-toggle]');if(!b)return;
     const c=b.closest('.card');c.classList.toggle('open');b.textContent=c.classList.contains('open')?'접기':'자세히 보기'};
   $('#tab-ins').onclick=e=>{
     const s=e.target.closest('[data-stage]');
-    if(s){st.stage=s.dataset.stage;st.status='진행';$('#stage').value=st.stage;$('#status').value='진행';tab('list');render();scrollTo(0,0);return}
+    if(s){Object.assign(st,{stage:s.dataset.stage,status:'진행',preset:'',watch:false});syncControls();tab('list');render();scrollTo(0,0);return}
     const l=e.target.closest('[data-law]');
-    if(l){st.q=l.dataset.law;$('#q').value=st.q;st.status='';$('#status').value='';st.stage='';$('#stage').value='';tab('list');render();scrollTo(0,0)}
+    if(l){Object.assign(st,{q:l.dataset.law,status:'',stage:'',preset:'',watch:false});syncControls();tab('list');render();scrollTo(0,0)}
   };
   $('#tab-ins').onchange=e=>{if(e.target.id==='bsel')renderBrief(+e.target.value)};
-    $('#tab-ins').onmousemove=e=>{
+  $('#tab-ins').onmousemove=e=>{
     const bar=e.target.closest('.bar'),tip=$('#tip');
     if(!bar){tip.style.display='none';return}
     const w=INS.weeks[+bar.dataset.i],hc=e.target.dataset.c||'';
     const rows=Object.entries(w.cats).sort((a,b)=>b[1]-a[1]);
     const d=s=>esc(s.slice(5).replace('-','/'));
     tip.innerHTML=`<div class="h">${d(w.from)} ~ ${d(w.to)} · 총 ${w.total}건</div>`+
+      (w.partial?'<div class="r" style="color:var(--sub)">수집 시작 전 주라 일부만 반영</div>':'')+
       (rows.map(([c,n])=>`<div class="r ${c===hc?'on':''}"><i style="background:${color(c)}"></i>${esc(c)}<b>${n}건</b></div>`).join('')
       ||'<div class="r">새 예고 없음</div>');
     tip.style.display='block';
@@ -259,21 +321,28 @@ function bind(){
   $('#tab-ins').onmouseleave=()=>{$('#tip').style.display='none'};
 }
 
-function base(){return data.filter(x=>(!st.extra||st.extra(x))&&(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
-  &&(!st.stage||stg(x).label===st.stage)
-  &&(!st.q||[x.title,x.proposer,x.org,x.field,x.law,sum(x)?.oneline,(sum(x)?.who||[]).join(' ')].join(' ').toLowerCase().includes(st.q.toLowerCase())))}
+// 검색: 제목·제안자·부처·법령명·AI 요약(주요 내용 포함)·원문까지
+const hay=x=>{const s=sum(x)||{};return [x.title,x.proposer,x.org,x.field,x.law,s.oneline,s.reason,s.impact,(s.points||[]).join(' '),(s.who||[]).join(' '),x.progress?.label,x.body].join(' ').toLowerCase()};
+function base(){
+  const P=PRESET[st.preset];
+  const qs=st.q.toLowerCase().split(/\s+/).filter(Boolean);
+  return data.filter(x=>(!P?.f||P.f(x))&&(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
+    &&(!st.stage||stg(x).label===st.stage)&&(!st.watch||isWatched(x))
+    &&(!qs.length||(h=>qs.every(q=>h.includes(q)))(hay(x))))}
 
+let lastList=[];
 function render(){
   const live=data.filter(x=>x.status==='진행');
   $('#stats').innerHTML=[
-    [live.length,'진행 중인 예고'],
+    [live.length,'진행 중인 예고·규칙'],
     [data.filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
     [live.filter(x=>{const n=dday(x);return n!==null&&n>=0&&n<=7}).length,'7일 내 의견마감'],
-    [live.filter(x=>[1,2].includes(stg(x).order)).length,'곧 확정될 하위법령·고시']
+    [live.filter(x=>SOON.includes(stg(x).label)).length,'곧 확정될 규칙·하위법령·고시']
   ].map(([b,s],i)=>`<button class="stat" data-go="${['live','new7','due7','soon'][i]}"><b>${b}</b><span>${s}</span></button>`).join('');
 
   const rows=base();
-    $('#pre').innerHTML=st.extra?`<span>📌 <b>${esc(st.extraLabel)}</b>만 보는 중</span><button id="preX">✕ 해제</button>`:'';
+  const P=PRESET[st.preset];
+  $('#pre').innerHTML=P?.f?`<span>📌 <b>${esc(P.label)}</b>만 보는 중</span><button id="preX">✕ 해제</button>`:'';
   const cats=Object.keys(COLORS).filter(c=>data.some(x=>(x.categories||[]).includes(c)));
   $('#chips').innerHTML=[['','전체',rows.length],...cats.map(c=>[c,c,rows.filter(x=>(x.categories||[]).includes(c)).length])]
     .map(([v,l,n])=>`<button class="chip ${st.cat===v?'on':''}" data-c="${esc(v)}" style="${st.cat===v?`background:${v?color(v):'#0f766e'}`:''}">${esc(l)}<i>${n}</i></button>`).join('');
@@ -281,27 +350,36 @@ function render(){
   let list=rows.filter(x=>!st.cat||(x.categories||[]).includes(st.cat));
   const due=x=>{const n=dday(x);return n===null||n<0?99999:n};
   if(st.sort==='due')list.sort((a,b)=>due(a)-due(b));
-  else if(st.sort==='imp')list.sort((a,b)=>((sum(b)?.importance||0)-(sum(a)?.importance||0))||due(a)-due(b));
   else list.sort((a,b)=>(b.first_seen||'').localeCompare(a.first_seen||''));
-  $('#grid').innerHTML=list.map(card).join('')||'<div class="empty">조건에 맞는 건이 없습니다.</div>';
+  lastList=list;
+  $('#grid').innerHTML=list.map(card).join('')||`<div class="empty">${st.watch?'관심 법령에 해당하는 건이 없습니다.':'조건에 맞는 건이 없습니다.'}</div>`;
+  writeHash();
+}
+
+function progress(x){
+  const p=x.progress;if(!p)return '';
+  return `<div class="prog ${p.dead?'dead':''}" title="국회 심사 단계: ${PROG.join(' → ')}">${PROG.map((_,i)=>`<i class="${i<p.step?'on':''}"></i>`).join('')}<b>${esc(p.label)}</b></div>`;
 }
 
 function card(x){
   const n=dday(x),s=sum(x),g=stg(x);
   const dd=n===null?'':n<0?'마감':n===0?'D-DAY':'D-'+n;
-  const imp=s?.importance?'★'.repeat(s.importance)+'☆'.repeat(3-s.importance):'';
+  const posted=!x.end&&(x.posted||x.start)?`게시 ${md(x.posted||x.start)}`:'';
   const li=a=>Array.isArray(a)&&a.length?`<ul>${a.map(v=>`<li>${esc(v)}</li>`).join('')}</ul>`:'';
   const sec=(h,b)=>b?`<h4>${h}</h4>${b}`:'';
   const p=v=>v?`<p>${esc(v)}</p>`:'';
-  return `<article class="card ${x.status==='종료'?'ended':''}">
+  const w=isWatched(x);
+  return `<article class="card ${x.status==='종료'?'ended':''} ${w?'watched':''}">
     <div class="top">
       <span class="b ${SRC[x.source]||'gov'}">${esc(srcName(x.source))}</span>
       ${g.label?`<span class="stage s${g.order}" title="${esc(g.speed+' · '+(g.note||''))}">${esc(g.label)}</span>`:''}
       ${age(x.first_seen)<3?'<span class="b new">NEW</span>':''}
-      ${dd?`<span class="dday ${n!==null&&n>=0&&n<=3?'hot':''}">${dd}</span>`:''}
+      ${dd?`<span class="dday ${n!==null&&n>=0&&n<=3?'hot':''}">${dd}</span>`:posted?`<span class="dday">${esc(posted)}</span>`:''}
+      <button class="star ${w?'on':''}" data-watch="${esc(lawKey(x))}" title="${w?'관심 법령에서 빼기':'이 법령을 관심 법령으로 등록'}">${w?'★':'☆'}</button>
     </div>
     <h3>${esc(x.title)}</h3>
-    <div class="meta">${[x.proposer,x.org,x.field].filter(Boolean).map(esc).join(' · ')}${imp?` · <span class="imp" title="${esc(s.importance_reason||'')}">${imp}</span>`:''}</div>
+    <div class="meta">${[x.proposer,x.org,x.field].filter(Boolean).map(esc).join(' · ')}</div>
+    ${progress(x)}
     <div class="tags">${(x.categories||[]).map(c=>`<span class="tag" style="background:${color(c)}">${esc(c)}</span>`).join('')}${(s?.who||[]).map(w=>`<span class="who">${esc(w)}</span>`).join('')}</div>
     ${s?.oneline?`<div class="one">${esc(s.oneline)}</div>`:''}
     <div class="more">
@@ -311,14 +389,27 @@ function card(x){
       ${sec('정책 방향',p(s?.direction))}
       ${sec('실무 체크포인트',p(s?.watch))}
       ${sec('우리 관점',p(s?.fit))}
-      ${sec('중요도 판단 근거',p(s?.importance_reason))}
-      ${x.body?`<h4>원문 발췌</h4><div class="raw">${esc(x.body)}</div>`:''}
+      ${x.body?`<h4>원문 발췌</h4><div class="raw">${esc(x.body.slice(0,6000))}${x.body.length>6000?'\n…(이하 생략, 원문 보기)':''}</div>`:''}
     </div>
     <div class="actions">
       <button class="btn" data-toggle>자세히 보기</button>
       ${x.link?`<a class="btn primary" href="${esc(x.link)}" target="_blank" rel="noopener">원문 보기</a>`:''}
     </div>
   </article>`;
+}
+
+function downloadCSV(){
+  const cols=[['구분',x=>srcName(x.source)],['단계',x=>stg(x).label],['상태',x=>x.status],['제목',x=>x.title],['제안자·부처',x=>x.proposer],
+    ['위원회·기관',x=>x.org],['분야',x=>(x.categories||[]).join(', ')],['영향 주체',x=>(sum(x)?.who||[]).join(', ')],
+    ['의견마감',x=>x.end?String(x.end).replace(/\.\s*/g,'-').replace(/-$/,''):''],['국회 심사단계',x=>x.progress?.label||''],
+    ['한 줄 요약',x=>sum(x)?.oneline||''],['수집일',x=>(x.first_seen||'').slice(0,10)],['원문 링크',x=>x.link]];
+  const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const csv='﻿'+[cols.map(c=>q(c[0])).join(','),...lastList.map(x=>cols.map(c=>q(c[1](x))).join(','))].join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`에너지입법예고_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  toast(`${lastList.length}건을 내려받았어요`);
 }
 
 function barList(arr,col){
@@ -332,17 +423,23 @@ function renderIns(){
   if(!I.weeks){el.innerHTML='<div class="ins"><div class="panel wide"><p class="hint">인사이트는 다음 자동 수집 때 처음 만들어집니다.</p></div></div>';return}
   const hist=(I.history||[]).filter(Boolean);
   const pipe=STAGES.map(([l,speed,note],i)=>{const s=(I.stages||[]).find(v=>v.label===l);
-    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i+1}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small></div>`}).join('');
+    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small></div>`}).join('');
   const max=Math.max(1,...I.weeks.map(w=>w.total));
-    const bars=I.weeks.map((w,wi)=>{
+  const bars=I.weeks.map((w,wi)=>{
     const e=Object.entries(w.cats);
-    return `<div class="bar" data-i="${wi}"><em>${w.total||''}</em><div class="stack" style="height:${w.total/max*80}%">${e.map(([c,n])=>`<i data-c="${esc(c)}" style="flex:${n};background:${color(c)}"></i>`).join('')}</div><span>${esc(w.to.slice(5).replace('-','/'))}</span></div>`}).join('');
-  const M=[...(I.momentum||[])].sort((a,b)=>(b.recent-b.before)-(a.recent-a.before));
+    return `<div class="bar ${w.partial?'partial':''}" data-i="${wi}"><em>${w.total||''}</em><div class="stack" style="height:${w.total/max*80}%">${e.map(([c,n])=>`<i data-c="${esc(c)}" style="flex:${n};background:${color(c)}"></i>`).join('')}</div><span>${esc(w.to.slice(5).replace('-','/'))}</span></div>`}).join('');
+  const since=I.since?md(I.since):'';
+  const partialNote=I.weeks.some(w=>w.partial)?`<p class="note">빗금 친 막대는 수집을 시작한 ${esc(since)} 이전 주입니다. 그때 이미 진행 중이던 건만 잡혀 있어 실제보다 적게 보여요.</p>`:'';
+  const ready=I.momentumReady!==false;
+  const M=[...(I.momentum||[])].sort((a,b)=>ready?(b.recent-b.before)-(a.recent-a.before):b.recent-a.recent);
   const mmax=Math.max(1,...M.map(m=>Math.max(m.recent,m.before)));
   const mom=M.map(m=>{const d=m.recent-m.before;
-    return `<div class="row"><span class="lb">${esc(m.cat)}</span><span class="track"><i style="width:${m.recent/mmax*100}%;background:${color(m.cat)}"></i></span><span class="v">${m.recent}건 ${d>=1?'<b class="up">▲</b>':d<=-1?'<b class="down">▼</b>':'–'}</span></div>`}).join('')||'<p class="hint">데이터가 쌓이면 표시됩니다.</p>';
+    const arrow=!ready?'':d>=1?' <b class="up">▲</b>':d<=-1?' <b class="down">▼</b>':' –';
+    return `<div class="row"><span class="lb">${esc(m.cat)}</span><span class="track"><i style="width:${m.recent/mmax*100}%;background:${color(m.cat)}"></i></span><span class="v">${m.recent}건${arrow}</span></div>`}).join('')||'<p class="hint">데이터가 쌓이면 표시됩니다.</p>';
+  const momHint=ready?'최근 4주 동안 새로 올라온 건수. ▲▼는 그 이전 8주(4주 환산)와 비교한 증감'
+    :`최근 4주 동안 새로 올라온 건수입니다. 비교할 과거 데이터가 아직 부족해 증감(▲▼)은 ${esc(I.momentumFrom||'')}부터 표시돼요.`;
   const hot=(I.hot||[]).map(h=>`<div class="hotl"><b>${esc(h.law)}</b> <span class="meta">${h.count}건 · ${h.stages.map(esc).join(' → ')}</span>
-    <ul>${h.items.map(i=>`<li><span class="b ${SRC[i.source]||'gov'}">${esc(srcName(i.source))}</span> ${esc(i.title)}</li>`).join('')}</ul>
+    <ul>${h.items.map(i=>`<li><span class="b ${SRC[i.source]||'gov'}">${esc(srcName(i.source))}</span> ${esc(i.proposer||i.title)}${i.date?` <span class="meta">· ${esc(md(i.date))}</span>`:''}${i.oneline?`<small>${esc(i.oneline)}</small>`:''}</li>`).join('')}</ul>
     <button class="btn" data-law="${esc(h.law)}">관련 건 모두 보기</button></div>`).join('')||'<p class="hint">아직 여러 건이 몰린 법령이 없습니다.</p>';
   el.innerHTML=`<div class="ins">
     <section class="panel wide brief">
@@ -351,10 +448,10 @@ function renderIns(){
       <div id="brief"></div>
     </section>
     <section class="panel wide"><h2>법이 되기까지 얼마나 남았나</h2>
-      <p class="hint">진행 중인 예고를 단계별로 나눴습니다. 왼쪽일수록 빨리 현실이 됩니다. 칸을 누르면 해당 건만 볼 수 있어요.</p><div class="pipe">${pipe}</div></section>
+      <p class="hint">진행 중인 예고와 최근 전력시장 규칙 개정을 단계별로 나눴습니다. 왼쪽일수록 빨리 현실이 됩니다. 칸을 누르면 해당 건만 볼 수 있어요.</p><div class="pipe">${pipe}</div></section>
     <section class="panel wide"><h2>최근 12주 예고 추이</h2>
-      <p class="hint">주별 새 예고 건수(색은 분야). 막대에 마우스를 올리면 내역이 보입니다. 수집 기간이 길어질수록 정확해집니다.</p><div class="bars">${bars}</div></section>
-    <section class="panel"><h2>분야별 모멘텀</h2><p class="hint">최근 4주 건수. ▲▼는 그 이전 8주(4주 환산)와 비교한 증감</p>${mom}</section>
+      <p class="hint">주별 새 예고 건수(색은 분야). 막대에 마우스를 올리면 내역이 보입니다.</p>${partialNote}<div class="bars">${bars}</div></section>
+    <section class="panel"><h2>분야별 모멘텀</h2><p class="hint">${momHint}</p>${mom}</section>
     <section class="panel"><h2>여러 건이 몰리는 법령</h2><p class="hint">최근 6개월 같은 법령에 예고가 2건 이상이면 개정 논의가 활발하다는 신호입니다. 국회안 뒤에 시행령이 따라오면 개정이 본격화된 것입니다.</p>${hot}</section>
     <section class="panel"><h2>누가 영향받나</h2><p class="hint">진행 중인 건의 AI 분석 기준</p>${barList(I.who||[],'#0d9488')}</section>
     <section class="panel"><h2>정책 방향</h2><p class="hint">규제를 조이는지, 푸는지, 지원하는지</p>${barList(I.direction||[],'#6366f1')}</section>
