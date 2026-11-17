@@ -66,7 +66,7 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .brief h3{margin:4px 0 10px;font-size:19px;line-height:1.45}
 .brief h4{margin:14px 0 4px;font-size:13px;color:#0d9488}
 .brief ul{margin:0;padding-left:18px}.brief li{margin:3px 0;font-size:14px}
-.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .step{border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:var(--bg)}
 .step:hover{border-color:var(--brand)}
 .step b{font-size:26px;display:block;margin-top:6px}
@@ -157,7 +157,6 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 <script>
 const COLORS={"탈탄소·기후":"#16a34a","집단에너지·열":"#ea580c","전기·전력":"#2563eb","재생에너지·PPA":"#0d9488","원자력":"#7c3aed","수소":"#0891b2","가스·석유·자원":"#b45309","에너지 일반·효율":"#64748b"};
 const STAGES=[
- ['확정·시행','이미 확정','심의·승인을 마치고 공고·시행되는 규칙'],
  ['고시·훈령 등','가장 빠름(수주~수개월)','국회 없이 부처가 확정·발령'],
  ['시행령·시행규칙','빠름(보통 수개월)','국회 의결 없이 국무회의 등으로 확정'],
  ['정부 법률안','중기(국회 심사 필요)','국무회의 후 국회 제출, 국회 통과가 남음'],
@@ -181,7 +180,7 @@ Promise.all([
   fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/insights.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(([d,m,ins])=>{
-  data=d.filter(x=>!/회의결과/.test(x.title||'')).map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
+    data=d.filter(x=>x.proposer!=='전력거래소').map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
   INS=ins||{};
   $('#upd').textContent='마지막 수집 '+m.updated;
   $('#stage').innerHTML='<option value="">모든 단계</option>'+STAGES.map(s=>`<option>${s[0]}</option>`).join('');
@@ -301,7 +300,7 @@ function renderIns(){
   if(!I.weeks){el.innerHTML='<div class="ins"><div class="panel wide"><p class="hint">인사이트는 다음 자동 수집 때 처음 만들어집니다.</p></div></div>';return}
   const hist=(I.history||[]).filter(Boolean);
   const pipe=STAGES.map(([l,speed,note],i)=>{const s=(I.stages||[]).find(v=>v.label===l);
-    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small></div>`}).join('');
+    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i+1}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small></div>`}).join('');
   const max=Math.max(1,...I.weeks.map(w=>w.total));
     const bars=I.weeks.map((w,wi)=>{
     const e=Object.entries(w.cats);
