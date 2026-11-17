@@ -1,0 +1,21 @@
+[
+  {
+    "name": "산업통상부",
+    "url": "https://www.motir.go.kr/kor/article/ATCLa6723dc7b",
+    "link": "ATCLa6723dc7b/\\d+/view",
+    "days": 45
+  },
+  {
+    "name": "기후에너지환경부",
+    "url": "https://www.mcee.go.kr/home/web/board/list.do?menuId=10557&boardMasterId=827",
+    "link": "board/read\\.do",
+    "days": 45
+  },
+  {
+    "name": "원자력안전위원회",
+    "url": "https://www.nssc.go.kr/ko/cms/FR_BBS_CON/BoardList.do?MENU_ID=980&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=22",
+    "link": "BoardView\\.do[^\"']*BBS_SEQ=\\d+",
+    "days": 45,
+    "cat": "원자력"
+  }
+]
