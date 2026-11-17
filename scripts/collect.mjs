@@ -319,8 +319,6 @@ async function gemini(prompt) {
 const WHO = ['발전사', '전력판매·한전', '집단에너지사업자', '재생에너지사업자', '가스·석유사업자', '원자력',
   '수소사업자', '전력다소비 기업', '일반소비자', '지자체', '정부·공공기관', '기타'];
 const DIR = ['규제강화', '규제완화', '지원·인센티브', '시장제도 변경', '절차·행정', '기타'];
-direction 판단 기준: 규제받는 대상(사업자·기관·국민)의 의무·제한이 늘거나 엄격해지면 '규제강화', 줄거나 느슨해지면 '규제완화'. 온도·수치 기준은 대상이 더 자유롭게 행동할 수 있게 바뀌면 완화(예: 냉방 28℃→26℃, 난방 18℃→20℃는 완화). 강화와 완화가 섞이면 비중이 큰 쪽을 고르고, importance_reason에 섞여 있다고 적을 것.
-
 let aiCalls = 0;
 async function summarize(item) {
   if (!GEMINI_KEY || !item.body || item.body.length < 150 || aiCalls >= AI_MAX) return null;
