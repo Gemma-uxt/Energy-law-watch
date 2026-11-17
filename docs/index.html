@@ -246,7 +246,6 @@ function card(x){
     <div class="tags">${(x.categories||[]).map(c=>`<span class="tag" style="background:${color(c)}">${esc(c)}</span>`).join('')}${(s?.who||[]).map(w=>`<span class="who">${esc(w)}</span>`).join('')}</div>
     ${s?.oneline?`<div class="one">${esc(s.oneline)}</div>`:''}
     <div class="more">
-      ${g.label?`<h4>법이 되기까지</h4><p>${esc(g.label)} · ${esc(g.speed||'')} — ${esc(g.note||'')}</p>`:''}
       ${sec('개정 이유',p(s?.reason))}
       ${sec('주요 내용',li(s?.points))}
       ${sec('영향·시사점',p(s?.impact))}
