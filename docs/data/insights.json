@@ -1,108 +1,128 @@
 {
- "updated": "2026-11-17 14:09",
+ "updated": "2026-11-17 16:45",
+ "since": "2026-11-10",
  "weeks": [
   {
    "from": "2026-08-26",
    "to": "2026-09-01",
    "total": 0,
-   "cats": {}
+   "cats": {},
+   "partial": true
   },
   {
    "from": "2026-09-02",
    "to": "2026-09-08",
    "total": 0,
-   "cats": {}
+   "cats": {},
+   "partial": true
   },
   {
    "from": "2026-09-09",
    "to": "2026-09-15",
-   "total": 0,
-   "cats": {}
+   "total": 1,
+   "cats": {
+    "전기·전력": 1,
+    "재생에너지·PPA": 1
+   },
+   "partial": true
   },
   {
    "from": "2026-09-16",
    "to": "2026-09-22",
    "total": 0,
-   "cats": {}
+   "cats": {},
+   "partial": true
   },
   {
    "from": "2026-09-23",
    "to": "2026-09-29",
-   "total": 0,
-   "cats": {}
+   "total": 2,
+   "cats": {
+    "전기·전력": 2,
+    "재생에너지·PPA": 2
+   },
+   "partial": true
   },
   {
    "from": "2026-09-30",
    "to": "2026-10-06",
    "total": 0,
-   "cats": {}
+   "cats": {},
+   "partial": true
   },
   {
    "from": "2026-10-07",
    "to": "2026-10-13",
-   "total": 1,
+   "total": 2,
    "cats": {
-    "가스·석유·자원": 1,
-    "에너지 일반·효율": 1,
-    "전기·전력": 1
-   }
+    "전기·전력": 2,
+    "재생에너지·PPA": 1,
+    "에너지 일반·효율": 1
+   },
+   "partial": true
   },
   {
    "from": "2026-10-14",
    "to": "2026-10-20",
    "total": 1,
    "cats": {
-    "가스·석유·자원": 1
-   }
+    "전기·전력": 1
+   },
+   "partial": true
   },
   {
    "from": "2026-10-21",
    "to": "2026-10-27",
    "total": 1,
    "cats": {
-    "가스·석유·자원": 1,
-    "에너지 일반·효율": 1,
-    "재생에너지·PPA": 1,
-    "전기·전력": 1
-   }
+    "전기·전력": 1,
+    "재생에너지·PPA": 1
+   },
+   "partial": true
   },
   {
    "from": "2026-10-28",
    "to": "2026-11-03",
-   "total": 1,
+   "total": 4,
    "cats": {
-    "가스·석유·자원": 1
-   }
+    "가스·석유·자원": 2,
+    "전기·전력": 2,
+    "재생에너지·PPA": 2
+   },
+   "partial": true
   },
   {
    "from": "2026-11-04",
    "to": "2026-11-10",
    "total": 12,
    "cats": {
-    "에너지 일반·효율": 5,
-    "전기·전력": 5,
     "집단에너지·열": 1,
-    "가스·석유·자원": 6,
+    "전기·전력": 5,
+    "가스·석유·자원": 7,
+    "에너지 일반·효율": 2,
     "탈탄소·기후": 1
-   }
+   },
+   "partial": true
   },
   {
    "from": "2026-11-11",
    "to": "2026-11-17",
    "total": 9,
    "cats": {
-    "에너지 일반·효율": 4,
-    "탈탄소·기후": 3,
+    "에너지 일반·효율": 3,
+    "재생에너지·PPA": 2,
     "원자력": 4,
-    "재생에너지·PPA": 3,
-    "전기·전력": 3
-   }
+    "전기·전력": 2,
+    "가스·석유·자원": 1,
+    "탈탄소·기후": 1
+   },
+   "partial": false
   }
  ],
  "momentum": [
   {
    "cat": "탈탄소·기후",
-   "recent": 4,
+   "recent": 2,
    "before": 0
   },
   {
@@ -112,13 +132,13 @@
   },
   {
    "cat": "전기·전력",
-   "recent": 9,
-   "before": 0.5
+   "recent": 10,
+   "before": 3
   },
   {
    "cat": "재생에너지·PPA",
-   "recent": 4,
-   "before": 0
+   "recent": 5,
+   "before": 2
   },
   {
    "cat": "원자력",
@@ -127,15 +147,17 @@
   },
   {
    "cat": "가스·석유·자원",
-   "recent": 8,
-   "before": 1
+   "recent": 10,
+   "before": 0
   },
   {
    "cat": "에너지 일반·효율",
-   "recent": 10,
+   "recent": 5,
    "before": 0.5
   }
  ],
+ "momentumReady": false,
+ "momentumFrom": "2027-02-02",
  "hot": [
   {
    "law": "전기사업법",
@@ -148,19 +170,28 @@
      "title": "전기사업법 일부개정법률안",
      "source": "국회",
      "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_373CCF9E539A4834B8AA96EA49B27B"
+     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_373CCF9E539A4834B8AA96EA49B27B",
+     "proposer": "김태선의원 등 11인",
+     "date": "2026-11-14",
+     "oneline": "노후 발전설비 안전관리 강화를 위한 전기사업법 개정안"
     },
     {
      "title": "전기사업법 일부개정법률안",
      "source": "국회",
      "status": "종료",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_5DDE3F2DF62D4868AB918B9E629F46"
+     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_5DDE3F2DF62D4868AB918B9E629F46",
+     "proposer": "김주영의원 등 10인",
+     "date": "2026-11-10",
+     "oneline": "전기위원회의 규제 권한 강화 및 한국전력감독원 신설을 위한 전기사업법 개정"
     },
     {
      "title": "전기사업법 일부개정법률안",
      "source": "국회",
      "status": "종료",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_99863E0088254CCFB63C9042E7D88A"
+     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_99863E0088254CCFB63C9042E7D88A",
+     "proposer": "박덕흠의원 등 10인",
+     "date": "2026-11-10",
+     "oneline": "전력산업기반기금 부담금 부과율 인하 및 감면 근거 마련"
     }
    ]
   },
@@ -175,13 +206,19 @@
      "title": "원자력시설 등의 방호 및 방사능 방재 대책법 시행령 일부개정령안 입법예고",
      "source": "정부",
      "status": "진행",
-     "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/89520"
+     "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/89520",
+     "proposer": "원자력안전위원회",
+     "date": "2026-11-13",
+     "oneline": "원자력시설 물리적방호 책임 확대에 따른 하위법령 정비"
     },
     {
      "title": "원자력시설 등의 방호 및 방사능 방재 대책법 시행규칙 일부개정령안 입법예고",
      "source": "정부",
      "status": "진행",
-     "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/89492"
+     "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/89492",
+     "proposer": "원자력안전위원회",
+     "date": "2026-11-13",
+     "oneline": "원자력시설 물리적방호 책임 확대에 따른 시행규칙 개정안 입법예고"
     }
    ]
   },
@@ -196,34 +233,59 @@
      "title": "분산에너지 활성화 특별법 일부개정법률안",
      "source": "국회",
      "status": "종료",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_CEBC1B984C1D4665B67880ED3BBB5D"
+     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_CEBC1B984C1D4665B67880ED3BBB5D",
+     "proposer": "한정애의원 등 12인",
+     "date": "2026-11-10",
+     "oneline": "지산지소형 전기사용시설 지정 및 지원 근거 마련"
     },
     {
      "title": "분산에너지 활성화 특별법 일부개정법률안",
      "source": "국회",
      "status": "종료",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_T2T6R0Q8R0Y4Z1Y1Y1W2X3W4D8E9C2"
+     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_T2T6R0Q8R0Y4Z1Y1Y1W2X3W4D8E9C2",
+     "proposer": "채현일의원 등 10인",
+     "date": "2026-11-10",
+     "oneline": "전력계통영향평가 대상 전기 사용 규모 기준을 5메가와트 이하로 확대"
     }
    ]
   }
  ],
  "stages": [
   {
+   "order": 0,
+   "key": "done",
+   "label": "확정·시행",
+   "speed": "이미 확정",
+   "note": "규칙개정위원회·전기위원회 심의와 장관 승인을 거쳐 공고·시행된 전력시장 규칙",
+   "n": 1
+  },
+  {
    "order": 1,
-   "label": "고시·훈령 등",
-   "speed": "가장 빠름(수주~수개월)",
-   "note": "국회를 거치지 않고 부처가 확정해 발령하는 행정규칙",
-   "n": 5
+   "key": "rule",
+   "label": "전력시장 규칙 심의",
+   "speed": "매우 빠름(보통 1~2개월)",
+   "note": "규칙개정위원회 → 전기위원회 심의 → 장관 승인 → 공고·시행. 국회·법제처를 거치지 않음",
+   "n": 4
   },
   {
    "order": 2,
+   "key": "adm",
+   "label": "고시·훈령 등",
+   "speed": "가장 빠름(수주~수개월)",
+   "note": "국회를 거치지 않고 부처가 확정해 발령하는 행정규칙",
+   "n": 6
+  },
+  {
+   "order": 3,
+   "key": "low",
    "label": "시행령·시행규칙",
    "speed": "빠름(보통 수개월)",
    "note": "국회 의결 없이 규제·법제처 심사와 국무회의(부령은 장관 발령)로 확정",
    "n": 7
   },
   {
-   "order": 4,
+   "order": 5,
+   "key": "na",
    "label": "국회 법률안",
    "speed": "장기·불확실",
    "note": "상임위·법사위·본회의를 모두 통과해야 하며, 상당수는 대안에 흡수되거나 임기만료로 폐기됨",
@@ -232,11 +294,23 @@
  ],
  "who": [
   [
-   "가스·석유사업자",
-   6
+   "정부·공공기관",
+   10
   ],
   [
-   "정부·공공기관",
+   "가스·석유사업자",
+   8
+  ],
+  [
+   "발전사",
+   7
+  ],
+  [
+   "재생에너지사업자",
+   7
+  ],
+  [
+   "전력판매·한전",
    5
   ],
   [
@@ -248,49 +322,45 @@
    4
   ],
   [
-   "발전사",
+   "원전 운영사",
    4
-  ],
-  [
-   "원자력",
-   4
-  ],
-  [
-   "재생에너지사업자",
-   3
-  ],
-  [
-   "전력판매·한전",
-   1
-  ],
-  [
-   "집단에너지사업자",
-   1
   ],
   [
    "기타",
+   2
+  ],
+  [
+   "집단에너지사업자",
+   2
+  ],
+  [
+   "전력다소비 기업",
+   1
+  ],
+  [
+   "발전사업자",
    1
   ]
  ],
  "direction": [
   [
+   "시장제도 변경",
+   7
+  ],
+  [
+   "규제완화",
+   6
+  ],
+  [
    "규제강화",
    6
   ],
   [
-   "규제완화",
-   5
-  ],
-  [
    "지원·인센티브",
-   3
+   4
   ],
   [
    "절차·행정",
-   2
-  ],
-  [
-   "시장제도 변경",
    1
   ]
  ],
