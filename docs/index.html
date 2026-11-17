@@ -35,7 +35,8 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:10px;transition:transform .15s,box-shadow .15s}
 .card:hover{transform:translateY(-2px);box-shadow:0 10px 28px #00000014}
 .card.ended{opacity:.55}
-.top{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.top{display:flex;flex-wrap:nowrap;gap:6px;align-items:center}
+.top>*{flex-shrink:0}
 .b{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px}
 .b.kpx{background:#cffafe;color:#0e7490}.b.na{background:#dbeafe;color:#1d4ed8}.b.gov{background:#d1fae5;color:#047857}.b.adm{background:#ede9fe;color:#6d28d9}.b.min{background:#fef3c7;color:#b45309}.b.new{background:#fee2e2;color:#b91c1c}
 .stage{font-size:12px;font-weight:600;padding:2px 9px;border-radius:6px;border:1px solid currentColor;cursor:help}
@@ -169,7 +170,8 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
       <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option></select>
       <button class="tool" id="watchOnly" title="☆를 눌러 등록한 법령만 보기">★ 관심 법령</button>
       <button class="tool" id="share" title="지금 보고 있는 필터 그대로 열리는 링크 복사">🔗 링크 복사</button>
-      <button class="tool" id="csv" title="지금 목록을 엑셀에서 열 수 있는 CSV로 내려받기">⬇ 엑셀(CSV)</button>
+      <button class="tool" id="openAll" title="지금 목록의 카드를 모두 펼치기">모두 열기</button>
+      <button class="tool" id="closeAll" title="펼친 카드를 모두 접기">모두 접기</button>
     </div>
     <div class="pre" id="pre"></div>
     <div class="chips" id="chips"></div>
@@ -287,7 +289,9 @@ function bind(){
   $('#share').onclick=async()=>{writeHash();
     try{await navigator.clipboard.writeText(location.href);toast('지금 화면 그대로 열리는 링크를 복사했어요')}
     catch{prompt('아래 링크를 복사하세요',location.href)}};
-  $('#csv').onclick=downloadCSV;
+  const setAll=open=>{let n=0;document.querySelectorAll('#grid .card').forEach(c=>{c.classList.toggle('open',open);const b=c.querySelector('[data-toggle]');if(b)b.textContent=open?'접기':'자세히 보기';n++});if(open&&n>30)toast(`${n}개 카드를 펼쳤어요`)};
+  $('#openAll').onclick=()=>setAll(true);
+  $('#closeAll').onclick=()=>setAll(false);
   $('#grid').onclick=e=>{
     const w=e.target.closest('[data-watch]');
     if(w){const k=w.dataset.watch;WATCH=WATCH.includes(k)?WATCH.filter(v=>v!==k):[...WATCH,k];saveWatch();
@@ -330,7 +334,6 @@ function base(){
     &&(!st.stage||stg(x).label===st.stage)&&(!st.watch||isWatched(x))
     &&(!qs.length||(h=>qs.every(q=>h.includes(q)))(hay(x))))}
 
-let lastList=[];
 function render(){
   const live=data.filter(x=>x.status==='진행');
   $('#stats').innerHTML=[
@@ -351,7 +354,6 @@ function render(){
   const due=x=>{const n=dday(x);return n===null||n<0?99999:n};
   if(st.sort==='due')list.sort((a,b)=>due(a)-due(b));
   else list.sort((a,b)=>(b.first_seen||'').localeCompare(a.first_seen||''));
-  lastList=list;
   $('#grid').innerHTML=list.map(card).join('')||`<div class="empty">${st.watch?'관심 법령에 해당하는 건이 없습니다.':'조건에 맞는 건이 없습니다.'}</div>`;
   writeHash();
 }
@@ -396,20 +398,6 @@ function card(x){
       ${x.link?`<a class="btn primary" href="${esc(x.link)}" target="_blank" rel="noopener">원문 보기</a>`:''}
     </div>
   </article>`;
-}
-
-function downloadCSV(){
-  const cols=[['구분',x=>srcName(x.source)],['단계',x=>stg(x).label],['상태',x=>x.status],['제목',x=>x.title],['제안자·부처',x=>x.proposer],
-    ['위원회·기관',x=>x.org],['분야',x=>(x.categories||[]).join(', ')],['영향 주체',x=>(sum(x)?.who||[]).join(', ')],
-    ['의견마감',x=>x.end?String(x.end).replace(/\.\s*/g,'-').replace(/-$/,''):''],['국회 심사단계',x=>x.progress?.label||''],
-    ['한 줄 요약',x=>sum(x)?.oneline||''],['수집일',x=>(x.first_seen||'').slice(0,10)],['원문 링크',x=>x.link]];
-  const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
-  const csv='﻿'+[cols.map(c=>q(c[0])).join(','),...lastList.map(x=>cols.map(c=>q(c[1](x))).join(','))].join('\r\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download=`에너지입법예고_${new Date().toISOString().slice(0,10)}.csv`;
-  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
-  toast(`${lastList.length}건을 내려받았어요`);
 }
 
 function barList(arr,col){
