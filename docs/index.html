@@ -100,6 +100,16 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 .what .paths div{background:#00000029;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5}
 .what .paths b{display:block;font-size:13.5px}
 @media(max-width:760px){.what .paths{grid-template-columns:1fr 1fr}}
+
+.tip{position:fixed;z-index:50;pointer-events:none;display:none;min-width:180px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px #0000002e;padding:10px 12px;font-size:12.5px}
+.tip .h{font-weight:700;margin-bottom:6px}
+.tip .r{display:flex;align-items:center;gap:6px;margin:3px 0}
+.tip .r i{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.tip .r b{margin-left:auto;font-weight:600}
+.tip .r.on{font-weight:700;background:var(--chip);border-radius:6px;padding:1px 4px;margin:3px -4px}
+.bar{cursor:pointer}
+.bar:hover .stack{filter:brightness(1.12)}
+
 </style>
 </head>
 <body>
@@ -123,9 +133,9 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 
 <main class="wrap">
   <section class="stats" id="stats"></section>
-  <nav class="tabs"><button data-tab="list" class="on">법안 목록</button><button data-tab="ins">인사이트</button></nav>
+  <nav class="tabs"><button data-tab="ins" class="on">이번 주 인사이트</button><button data-tab="list">법안 목록</button></nav>
 
-  <div id="tab-list">
+  <div id="tab-list" hidden>
     <div class="toolbar">
       <input class="search" id="q" placeholder="법령명, 부처, 위원회, 요약, 영향 주체 검색">
       <div class="seg" id="src">
@@ -139,7 +149,8 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
     <section class="grid" id="grid"><div class="empty">불러오는 중…</div></section>
   </div>
 
-  <div id="tab-ins" hidden></div>
+  <div id="tab-ins"></div>
+  <div class="tip" id="tip"></div>
 </main>
 <footer>출처: 열린국회정보 · 국민참여입법센터 · 각 부처·기관 홈페이지 | 요약·분석·브리핑은 AI가 생성한 것으로, 정확한 내용은 원문을 확인하세요.</footer>
 
@@ -199,6 +210,23 @@ function bind(){
     if(l){st.q=l.dataset.law;$('#q').value=st.q;st.status='';$('#status').value='';st.stage='';$('#stage').value='';tab('list');render();scrollTo(0,0)}
   };
   $('#tab-ins').onchange=e=>{if(e.target.id==='bsel')renderBrief(+e.target.value)};
+    $('#tab-ins').onmousemove=e=>{
+    const bar=e.target.closest('.bar'),tip=$('#tip');
+    if(!bar){tip.style.display='none';return}
+    const w=INS.weeks[+bar.dataset.i],hc=e.target.dataset.c||'';
+    const rows=Object.entries(w.cats).sort((a,b)=>b[1]-a[1]);
+    const d=s=>esc(s.slice(5).replace('-','/'));
+    tip.innerHTML=`<div class="h">${d(w.from)} ~ ${d(w.to)} · 총 ${w.total}건</div>`+
+      (rows.map(([c,n])=>`<div class="r ${c===hc?'on':''}"><i style="background:${color(c)}"></i>${esc(c)}<b>${n}건</b></div>`).join('')
+      ||'<div class="r">새 예고 없음</div>');
+    tip.style.display='block';
+    const r=tip.getBoundingClientRect();
+    let x=e.clientX+14,y=e.clientY+14;
+    if(x+r.width>innerWidth-8)x=e.clientX-r.width-14;
+    if(y+r.height>innerHeight-8)y=e.clientY-r.height-14;
+    tip.style.left=x+'px';tip.style.top=y+'px';
+  };
+  $('#tab-ins').onmouseleave=()=>{$('#tip').style.display='none'};
 }
 
 function base(){return data.filter(x=>(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
@@ -275,9 +303,9 @@ function renderIns(){
   const pipe=STAGES.map(([l,speed,note],i)=>{const s=(I.stages||[]).find(v=>v.label===l);
     return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small></div>`}).join('');
   const max=Math.max(1,...I.weeks.map(w=>w.total));
-  const bars=I.weeks.map(w=>{
+    const bars=I.weeks.map((w,wi)=>{
     const e=Object.entries(w.cats);
-    return `<div class="bar" title="${esc(w.from+' ~ '+w.to+' · '+w.total+'건\n'+e.map(([c,n])=>c+' '+n).join('\n'))}"><em>${w.total||''}</em><div class="stack" style="height:${w.total/max*80}%">${e.map(([c,n])=>`<i style="flex:${n};background:${color(c)}"></i>`).join('')}</div><span>${esc(w.to.slice(5).replace('-','/'))}</span></div>`}).join('');
+    return `<div class="bar" data-i="${wi}"><em>${w.total||''}</em><div class="stack" style="height:${w.total/max*80}%">${e.map(([c,n])=>`<i data-c="${esc(c)}" style="flex:${n};background:${color(c)}"></i>`).join('')}</div><span>${esc(w.to.slice(5).replace('-','/'))}</span></div>`}).join('');
   const M=[...(I.momentum||[])].sort((a,b)=>(b.recent-b.before)-(a.recent-a.before));
   const mmax=Math.max(1,...M.map(m=>Math.max(m.recent,m.before)));
   const mom=M.map(m=>{const d=m.recent-m.before;
