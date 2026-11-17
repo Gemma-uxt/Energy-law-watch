@@ -181,7 +181,7 @@ Promise.all([
   fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/insights.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(([d,m,ins])=>{
-  data=d.map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
+  data=d.filter(x=>!/회의결과/.test(x.title||'')).map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
   INS=ins||{};
   $('#upd').textContent='마지막 수집 '+m.updated;
   $('#stage').innerHTML='<option value="">모든 단계</option>'+STAGES.map(s=>`<option>${s[0]}</option>`).join('');
