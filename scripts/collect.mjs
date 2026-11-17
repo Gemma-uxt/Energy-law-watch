@@ -192,35 +192,48 @@ async function fetchBoards() {
   const out = [];
   for (const b of BOARDS) {
     let n = 0;
-    try {
-      const html = await get(b.url);
-      const re = new RegExp(b.link, 'i');
-      const blocks = html.match(/<tr[\s\S]*?<\/tr>/gi) || html.match(/<li[\s\S]*?<\/li>/gi) || [];
-      const seen = new Set();
-      for (const blk of blocks) {
-        const a = (blk.match(/<a\b[^>]*>[\s\S]*?<\/a>/gi) || []).find((x) => re.test(x));
-        if (!a) continue;
-        const href = decode((a.match(/href="([^"]+)"/i) || [])[1] || '');
-        if (!href || href.startsWith('#') || /^javascript/i.test(href)) continue;
-        const link = new URL(href, b.url).href
-          .replace(/;jsessionid=[^?#]*/i, '').replace(/([?&])pageIndex=\d+&?/, '$1');
-        if (seen.has(link)) continue;
-        seen.add(link);
-        const dm = clean(blk).match(/(20\d{2})[-.]\s*(\d{1,2})[-.]\s*(\d{1,2})/);
-        const posted = dm ? `${dm[1]}-${dm[2].padStart(2, '0')}-${dm[3].padStart(2, '0')}` : '';
-        if (posted && (Date.parse(TODAY) - Date.parse(posted)) / 864e5 > (b.days || 45)) continue;
-        const title = clean(a).replace(/\s*(새\s*창|새창열림|첨부파일).*$/, '').trim();
-        if (title.length < 5) continue;
-        out.push({
-          id: 'MIN-' + createHash('md5').update(link).digest('hex').slice(0, 12),
-          source: '부처', title, proposer: b.name, org: '행정예고(부처 게시판)',
-          field: b.cat || '', start: posted, end: '', posted, link,
-        });
-        n++;
-      }
-    } catch (e) { console.log(`  ! [부처] ${b.name} 실패: ${e.message}`); }
-    console.log(`[부처] ${b.name}: ${n}건`);
-    await sleep(1000);
+    const re = new RegExp(b.link, 'i');
+    const only = b.only ? new RegExp(b.only) : null;
+    const seen = new Set();
+    for (let p = 1; p <= (b.pages || 1); p++) {
+      const url = p === 1 ? b.url
+        : `${b.url}${b.url.includes('?') ? '&' : '?'}${b.pageParam || 'pageIndex'}=${p}`;
+      let added = 0;
+      try {
+        const html = await get(url);
+        const blocks = html.match(/<tr[\s\S]*?<\/tr>/gi) || html.match(/<li[\s\S]*?<\/li>/gi) || [];
+        for (const blk of blocks) {
+          const a = (blk.match(/<a\b[^>]*>[\s\S]*?<\/a>/gi) || []).find((x) => re.test(x));
+          if (!a) continue;
+          const href = decode((a.match(/href="([^"]+)"/i) || [])[1] || '');
+          if (!href || href.startsWith('#') || /^javascript/i.test(href)) continue;
+          const link = new URL(href, url).href.replace(/;jsessionid=[^?#]*/i, '')
+            .replace(/([?&])(pageIndex|nPage|lcmspage)=\d+&?/g, '$1');
+          if (seen.has(link)) continue;
+          seen.add(link);
+          added++;
+          const title = clean(a).replace(/\s*(새\s*창|새창열림|첨부파일).*$/, '').trim();
+          if (title.length < 5 || (only && !only.test(title))) continue;
+          // 제목 안의 날짜(예: 규칙(2026.10.31,시행))와 헷갈리지 않도록 링크 밖에서만 날짜를 찾음
+          const ds = [...clean(blk.replace(a, '')).matchAll(/(20\d{2})[-./]\s*(\d{1,2})[-./]\s*(\d{1,2})/g)]
+            .map((m) => `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`);
+          const posted = ds[0] || '';
+          const end = b.period && ds[1] ? ds[1] : '';
+          if (end && end < TODAY) continue;
+          if (!end && posted && (Date.parse(TODAY) - Date.parse(posted)) / 864e5 > (b.days || 45)) continue;
+          out.push({
+            id: 'MIN-' + createHash('md5').update(link).digest('hex').slice(0, 12),
+            source: '부처', title, proposer: b.name, org: b.kind || '행정예고(부처 게시판)',
+            field: b.cat || '', start: posted, end, posted, link,
+            cat: b.cat || '', noDeadline: !!b.noDeadline,
+          });
+          n++;
+        }
+      } catch (e) { console.log(`  ! [부처] ${b.name} ${p}페이지 실패: ${e.message}`); }
+      if (!added) break;
+      await sleep(1000);
+    }
+    console.log(`[부처] ${b.name}${b.kind ? `(${b.kind})` : ''}: ${n}건`);
   }
   return out;
 }
@@ -228,13 +241,23 @@ async function fetchBoards() {
 async function fetchBoardBody(item) {
   try {
     const t = htmlToText(await get(item.link));
-    const dl = t.match(/(20\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*까지/);
-    item.end = dl ? `${dl[1]}-${dl[2].padStart(2, '0')}-${dl[3].padStart(2, '0')}`
-      : (item.posted ? addDays(item.posted, 20) : '');
+    if (/(\.\.\.|…)$/.test(item.title)) {          // 잘린 제목 복원
+      const p = item.title.replace(/(\.\.\.|…)$/, '').trim();
+      const full = t.split('\n').map((s) => s.trim()).find((s) => s.startsWith(p) && s.length > p.length);
+      if (full) item.title = full.slice(0, 200);
+    }
+    if (!item.end && !item.noDeadline) {
+      const dl = t.match(/(20\d{2})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일\s*까지/);
+      item.end = dl ? `${dl[1]}-${dl[2].padStart(2, '0')}-${dl[3].padStart(2, '0')}`
+        : (item.posted ? addDays(item.posted, 20) : '');
+    }
     const m = t.match(/((제정|개정|폐지)\s*(이유|사유)|주요\s*내용)[\s\S]{30,5000}?(?=의견\s*제출|$)/);
     if (m) return m[0].slice(0, 4000).trim();
-    const i = t.indexOf('행정절차법');
-    return i >= 0 ? t.slice(Math.max(0, i - 300), i + 2500).trim() : '';
+    for (const key of ['행정절차법', '알려드리오니', '회의결과']) {
+      const i = t.indexOf(key);
+      if (i >= 0) return t.slice(Math.max(0, i - 300), i + 2500).trim();
+    }
+    return '';
   } catch { return ''; }
 }
 
@@ -245,7 +268,7 @@ const normT = (s) => (s || '').replace(/[^가-힣A-Za-z0-9]/g, '')
 // ---------- Gemini 요약 (무료 등급) ----------
 let aiCalls = 0;
 async function summarize(item) {
-  if (!GEMINI_KEY || !item.body || aiCalls >= AI_MAX) return null;
+  if (!GEMINI_KEY || !item.body || item.body.length < 150 || aiCalls >= AI_MAX) return null;
   aiCalls++;
   const prompt =
 `너는 에너지 분야 법률 분석가야. 아래 입법예고 원문을 읽고 JSON으로만 답해.
@@ -314,6 +337,7 @@ const current = new Set();
 const newItems = [];
 for (const it of fetched) {
   let cats = classify(`${it.title} ${it.field}`);
+  if (it.cat) cats = [...new Set([...cats, it.cat])];
   if (!cats.length) continue;
   current.add(it.id);
   const prev = old.get(it.id);
