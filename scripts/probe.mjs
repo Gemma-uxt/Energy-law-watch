@@ -1,10 +1,7 @@
-import fs from 'node:fs';
-import { checkPromulgation, docName } from './promul.mjs';
-const list = JSON.parse(fs.readFileSync('docs/data/bills.json', 'utf8')).filter((x) => ['정부', '행정규칙', '부처'].includes(x.source));
-for (const x of list) {
-  try { console.log('P|', x.source, '|', x.title.slice(0, 40), '|', docName(x.title), '|', JSON.stringify(await checkPromulgation(x))); }
-  catch (e) { console.log('P| ERR', x.title, e.message); }
-}
-// 이미 공포된 것으로 확인 테스트: 전기사업법 시행령 (11/10 공포), 예고 시작 가정 10/1
-console.log('P| TEST', JSON.stringify(await checkPromulgation({ source: '정부', title: '전기사업법 시행령 일부개정령안 입법예고', start: '2026-10-01' })));
-console.log('P| TEST2', JSON.stringify(await checkPromulgation({ source: '행정규칙', title: '공공기관 에너지이용 합리화 추진에 관한 규정 일부개정안', start: '2026-04-01' })));
+const UA = { 'User-Agent': 'Mozilla/5.0', Accept: 'text/html,*/*' };
+const u = 'https://www.law.go.kr/LSW/admRulSc.do?menuId=5&subMenuId=41&tabMenuId=183&query=' + encodeURIComponent('공공기관 에너지이용 합리화 추진에 관한 규정');
+const t = await (await fetch(u, { headers: UA })).text();
+const i = t.indexOf('2026-111'); console.log('P| idx', i, t.length);
+console.log('P|', t.slice(i - 1500, i + 1200).replace(/\s+/g, ' '));
+const srcs = [...new Set([...t.matchAll(/(admRul[A-Za-z]*\.do)/g)].map((m) => m[1]))]; console.log('P| do:', srcs.join(' '));
+const k = t.indexOf('검색결과 목록'); console.log('P| list area', t.slice(k - 200, k + 1500).replace(/\s+/g, ' '));
