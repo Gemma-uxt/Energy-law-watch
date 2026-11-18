@@ -11,7 +11,7 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:Pretendard,system-ui,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
 .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
-header{background:linear-gradient(135deg,#0f766e 0%,#0e7490 55%,#1e3a8a 100%);color:#fff;padding:40px 0 88px}
+header{background:linear-gradient(135deg,#0f766e 0%,#0e7490 55%,#1e3a8a 100%);color:#fff;padding:40px 0 36px}
 header h1{margin:0;font-size:30px;letter-spacing:-.6px}
 header p{margin:6px 0 0;opacity:.85;font-size:14px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:-60px}
@@ -158,7 +158,6 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 </div></header>
 
 <main class="wrap">
-  <section class="stats" id="stats"></section>
   <nav class="tabs"><button data-tab="ins" class="on">이번 주 인사이트</button><button data-tab="list">법안 목록</button></nav>
 
   <div id="tab-list" hidden>
@@ -346,13 +345,7 @@ function base(){
 
 function render(){
   const live=shown().filter(x=>x.status==='진행');
-  $('#stats').innerHTML=[
-    [live.length,'진행 중인 예고·규칙'],
-    [shown().filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
-    [live.filter(x=>{const n=dday(x);return n!==null&&n>=0&&n<=7}).length,'7일 내 의견마감'],
-    [live.filter(x=>SOON.includes(stg(x).label)).length,'곧 확정될 규칙·하위법령·고시']
-  ].map(([b,s],i)=>{const k=['live','new7','','soon'][i];   // 7일 내 의견마감은 숫자만 표시(누르면 거르는 기능 없음)
-    return k?`<button class="stat" data-go="${k}"><b>${b}</b><span>${s}</span></button>`:`<div class="stat" style="cursor:default"><b>${b}</b><span>${s}</span></div>`}).join('');
+  // (상단 숫자 카드는 제거함)
 
   const rows=base();
   const P=PRESET[st.preset];
