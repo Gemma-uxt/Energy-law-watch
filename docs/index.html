@@ -276,7 +276,7 @@ const PRESET={
 };
 function go(k){
   const p=PRESET[k]||{status:'진행',stage:k};
-  Object.assign(st,{cat:'',src:'',q:'',watch:false,stage:p.stage||'',status:p.status,sort:p.sort||st.sort,preset:PRESET[k]?k:''});
+  Object.assign(st,{cat:'',src:'',q:'',watch:false,low:false,stage:p.stage||'',status:p.status,sort:p.sort||st.sort,preset:PRESET[k]?k:''});
   syncControls();tab('list');render();
   $('.tabs').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -312,9 +312,9 @@ function bind(){
     const c=b.closest('.card');c.classList.toggle('open');b.textContent=c.classList.contains('open')?'접기':'자세히 보기'};
   $('#tab-ins').onclick=e=>{
     const s=e.target.closest('[data-stage]');
-    if(s){Object.assign(st,{stage:s.dataset.stage,status:'진행',preset:'',watch:false});syncControls();tab('list');render();scrollTo(0,0);return}
+    if(s){Object.assign(st,{stage:s.dataset.stage,status:'진행',preset:'',watch:false,src:'',q:'',cat:'',low:false});syncControls();tab('list');render();scrollTo(0,0);return}
     const l=e.target.closest('[data-law]');
-    if(l){Object.assign(st,{q:l.dataset.law,status:'',stage:'',preset:'',watch:false});syncControls();tab('list');render();scrollTo(0,0)}
+    if(l){Object.assign(st,{q:l.dataset.law,status:'',stage:'',preset:'',watch:false,src:'',cat:''});syncControls();tab('list');render();scrollTo(0,0)}
   };
   $('#tab-ins').onchange=e=>{if(e.target.id==='bsel')renderBrief(+e.target.value)};
   $('#tab-ins').onmousemove=e=>{
@@ -430,8 +430,9 @@ function renderIns(){
   const I=INS,el=$('#tab-ins');
   if(!I.weeks){el.innerHTML='<div class="ins"><div class="panel wide"><p class="hint">인사이트는 다음 자동 수집 때 처음 만들어집니다.</p></div></div>';return}
   const hist=(I.history||[]).filter(Boolean);
-  const pipe=STAGES.map(([l,speed,note,route],i)=>{const s=(I.stages||[]).find(v=>v.label===l);
-    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small><small class="route">${esc(route)}</small></div>`}).join('');
+  const liveNow=data.filter(x=>x.status==='진행'&&!isLow(x));   // 목록 기본 화면과 같은 기준으로 셈
+  const pipe=STAGES.map(([l,speed,note,route],i)=>{const n=liveNow.filter(x=>stg(x).label===l).length;
+    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i}">${esc(l)}</span><b>${n}</b><small>${esc(speed)}</small><small>${esc(note)}</small><small class="route">${esc(route)}</small></div>`}).join('');
   const max=Math.max(1,...I.weeks.map(w=>w.total));
   const bars=I.weeks.map((w,wi)=>{
     const e=Object.entries(w.cats);
