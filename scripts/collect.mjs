@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileText } from './attach.mjs';
+import { checkPromulgation } from './promul.mjs';
 
 const KW = JSON.parse(fs.readFileSync('scripts/keywords.json', 'utf8'));
 const BOARDS = fs.existsSync('scripts/boards.json') ? JSON.parse(fs.readFileSync('scripts/boards.json', 'utf8')) : [];
@@ -694,6 +695,11 @@ function finalize(v) {
   else v.status = v.status || '진행';
   // 국회 법률안: 입법예고가 끝나도 국회 심사가 진행 중이면 '진행' 유지 → 본회의 처리·정부이송·공포 또는 폐기·대안반영 시 '종료'
   if (v.source === '국회' && v.progress) v.status = (v.progress.dead || v.progress.step >= 4) ? '종료' : '진행';
+  // 시행령·시행규칙·고시: 마감 후 '공포 전'이면 180일까지, '공포됨'이면 공포 후 30일까지 진행중 목록에 유지
+  if (['정부', '행정규칙', '부처'].includes(v.source) && end && end < TODAY && !v.noDeadline) {
+    const days = (d) => (Date.parse(TODAY) - Date.parse(d)) / 864e5;
+    v.status = v.promul?.done ? (days(v.promul.ancYd) <= 30 ? '진행' : '종료') : (days(end) <= 180 ? '진행' : '종료');
+  }
   if (v.summary && typeof v.summary === 'object') {
     delete v.summary.importance; delete v.summary.importance_reason;
     if (Array.isArray(v.summary.who)) v.summary.who = [...new Set(v.summary.who.map((w) => WHO_FIX[w] || w))];
@@ -792,6 +798,22 @@ for (const v of OFFLINE ? [] : old.values()) {
   prog++;
   try { const p = await fetchBillProgress(v); if (p) v.progress = p; } catch (e) { console.log(`  ! 심사단계 조회 실패: ${v.title}`); }
   await sleep(300);
+}
+
+// 시행령·시행규칙·고시: 예고 마감 후 실제 공포(발령)됐는지 국가법령정보센터에서 확인 (하루 1번, 마감 후 180일까지)
+const PROMUL_SRC = ['정부', '행정규칙', '부처'];
+let pc = 0;
+for (const v of OFFLINE ? [] : old.values()) {
+  const end = toISO(v.end);
+  if (!PROMUL_SRC.includes(v.source) || !end || end >= TODAY || v.promul?.done || v.promul?.checked === TODAY) continue;
+  if ((Date.parse(TODAY) - Date.parse(end)) / 864e5 > 180 || pc >= 40) continue;
+  pc++;
+  try {
+    const r = await checkPromulgation(v);
+    if (r) v.promul = { done: r.done, ancYd: r.ancYd, efYd: r.efYd, no: r.no, checked: TODAY };
+    if (r?.done) console.log(`  공포 확인: ${v.title} (${r.ancYd}, ${r.no})`);
+  } catch (e) { console.log(`  ! 공포 여부 확인 실패: ${v.title} — ${e.message}`); }
+  await sleep(500);
 }
 
 for (const v of old.values()) finalize(v);

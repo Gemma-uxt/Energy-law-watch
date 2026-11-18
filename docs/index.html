@@ -46,6 +46,7 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .card h3{margin:0;font-size:17px;line-height:1.45;letter-spacing:-.3px}
 .meta{font-size:13px;color:var(--sub)}
 .pm b{display:inline-block;font-size:12px;background:#dcfce7;color:#166534;border-radius:5px;padding:1px 7px;margin:6px 0 2px}.pm b.neg{background:#fee2e2;color:#991b1b}.pm small{color:var(--sub)}
+.dday.pdone{background:#dcfce7;color:#166534}.dday.pwait{background:#fef3c7;color:#92400e}
 .star{border:0;background:none;cursor:pointer;font-size:18px;line-height:1;color:var(--sub);padding:0 2px}
 .star.on{color:#f59e0b}
 .card.watched{border-color:#f59e0b;box-shadow:0 0 0 1px #f59e0b inset}
@@ -167,7 +168,7 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
         <button data-v="" class="on">전체</button><button data-v="국회">국회</button><button data-v="정부">정부</button><button data-v="행정규칙">행정규칙</button><button data-v="부처">부처·기관</button><button data-v="전력시장">전력시장</button>
       </div>
       <select id="stage"></select>
-      <select id="status"><option value="진행">진행중</option><option value="">전체</option><option value="종료">종료</option></select>
+      <select id="status"><option value="진행">진행중</option><option value="">전체</option><option value="공포전">마감·공포 전</option><option value="공포됨">공포됨</option><option value="종료">종료</option></select>
       <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option></select>
       <button class="tool" id="watchOnly" title="☆를 눌러 등록한 법령만 보기">★ 관심 법령</button>
       <button class="tool" id="share" title="지금 보고 있는 필터 그대로 열리는 링크 복사">🔗 링크 복사</button>
@@ -201,6 +202,10 @@ const SRC={'국회':'na','정부':'gov','행정규칙':'adm','부처':'min','전
 const PROG=['접수','소관위','법사위','본회의','정부이송','공포'];
 const color=c=>COLORS[c]||'#475569';
 const DEF={tab:'ins',cat:'',src:'',status:'진행',stage:'',sort:'new',q:'',watch:false,preset:'',low:false};
+const AFTER=['정부','행정규칙','부처'];
+// 마감 후 공포 상태: 'done' 공포됨 / 'wait' 마감·공포 전 / '' 해당 없음
+const promulOf=x=>{if(!AFTER.includes(x.source))return '';const n=dday(x);if(n===null||n>=0)return '';return x.promul?.done?'done':'wait'};
+const stOk=x=>!st.status||(st.status==='공포전'?promulOf(x)==='wait':st.status==='공포됨'?promulOf(x)==='done':x.status===st.status);
 const isLow=x=>sum(x)?.relevance==='낮음';
 const shown=()=>st.low?data:data.filter(x=>!isLow(x));
 const st={...DEF};
@@ -241,7 +246,7 @@ Promise.all([
   fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/insights.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(([d,m,ins])=>{
-  data=d.map(x=>{const n=dday(x);if(n!==null&&n<0&&!(x.source==='국회'&&x.progress))x.status='종료';return x});   // 국회안은 심사 단계로 판단
+  data=d.map(x=>{const n=dday(x);if(n!==null&&n<0&&!(x.source==='국회'&&x.progress)&&!AFTER.includes(x.source))x.status='종료';return x});   // 국회안은 심사 단계, 시행령·고시는 공포 여부로 판단(수집기)
   INS=ins||{};
   $('#upd').textContent='마지막 수집 '+m.updated;
   $('#stage').innerHTML='<option value="">모든 단계</option>'+STAGES.map(s=>`<option>${s[0]}</option>`).join('');
@@ -335,7 +340,7 @@ const hay=x=>{const s=sum(x)||{};return [x.title,x.proposer,x.org,x.field,x.law,
 function base(){
   const P=PRESET[st.preset];
   const qs=st.q.toLowerCase().split(/\s+/).filter(Boolean);
-  return shown().filter(x=>(!P?.f||P.f(x))&&(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
+  return shown().filter(x=>(!P?.f||P.f(x))&&(!st.src||x.source===st.src)&&stOk(x)
     &&(!st.stage||stg(x).label===st.stage)&&(!st.watch||isWatched(x))
     &&(!qs.length||(h=>qs.every(q=>h.includes(q)))(hay(x))))}
 
@@ -379,7 +384,8 @@ function permits(arr){
 }
 function card(x){
   const n=dday(x),s=sum(x),g=stg(x);
-  const dd=n===null?'':n<0?(x.source==='국회'&&x.status==='진행'?'예고 끝·심사 중':'마감'):n===0?'D-DAY':'D-'+n;
+  const pm=promulOf(x);
+  const dd=n===null?'':n<0?(x.source==='국회'&&x.status==='진행'?'예고 끝·심사 중':pm==='done'?`공포 ${md(x.promul.ancYd)}${x.promul.efYd?` · 시행 ${md(x.promul.efYd)}`:''}`:pm==='wait'?'마감·공포 전':'마감'):n===0?'D-DAY':'D-'+n;
   const posted=!x.end&&(x.posted||x.start)?`게시 ${md(x.posted||x.start)}`:'';
   const li=a=>Array.isArray(a)&&a.length?`<ul>${a.map(v=>`<li>${esc(v)}</li>`).join('')}</ul>`:'';
   const sec=(h,b)=>b?`<h4>${h}</h4>${b}`:'';
@@ -390,7 +396,7 @@ function card(x){
       <span class="b ${SRC[x.source]||'gov'}">${esc(srcName(x.source))}</span>
       ${g.label?`<span class="stage s${g.order}" title="${esc(g.speed+' · '+(g.note||''))}">${esc(g.label)}</span>`:''}
       ${age(x.first_seen)<3?'<span class="b new">NEW</span>':''}${isLow(x)?'<span class="b" style="background:#f1f5f9;color:#64748b" title="AI 판단: 전력시장·발전사업과 관련 낮음">관련 낮음</span>':''}
-      ${dd?`<span class="dday ${n!==null&&n>=0&&n<=3?'hot':''}">${dd}</span>`:posted?`<span class="dday">${esc(posted)}</span>`:''}
+      ${dd?`<span class="dday ${n!==null&&n>=0&&n<=3?'hot':''} ${pm==='done'?'pdone':pm==='wait'?'pwait':''}" ${pm==='done'&&x.promul.no?`title="${esc(x.promul.no)}"`:''}>${esc(dd)}</span>`:posted?`<span class="dday">${esc(posted)}</span>`:''}
       <button class="star ${w?'on':''}" data-watch="${esc(lawKey(x))}" title="${w?'관심 법령에서 빼기':'이 법령을 관심 법령으로 등록'}">${w?'★':'☆'}</button>
     </div>
     <h3>${esc(x.title)}</h3>
