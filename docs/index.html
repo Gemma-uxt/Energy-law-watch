@@ -171,6 +171,7 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
       <select id="sort"><option value="new">최신 수집순</option><option value="due">마감 임박순</option></select>
       <button class="tool" id="watchOnly" title="☆를 눌러 등록한 법령만 보기">★ 관심 법령</button>
       <button class="tool" id="share" title="지금 보고 있는 필터 그대로 열리는 링크 복사">🔗 링크 복사</button>
+      <button class="tool" id="lowBtn" title="AI가 전력시장·발전사업과 관련이 낮다고 본 건(공사·안전·제재 등)">관련 낮은 건 보기</button>
       <button class="tool" id="openAll" title="지금 목록의 카드를 모두 펼치기">모두 열기</button>
       <button class="tool" id="closeAll" title="펼친 카드를 모두 접기">모두 접기</button>
     </div>
@@ -199,7 +200,9 @@ const SOON=['전력시장 규칙 심의','고시·훈령 등','시행령·시행
 const SRC={'국회':'na','정부':'gov','행정규칙':'adm','부처':'min','전력시장':'kpx'};
 const PROG=['접수','소관위','법사위','본회의','정부이송','공포'];
 const color=c=>COLORS[c]||'#475569';
-const DEF={tab:'ins',cat:'',src:'',status:'진행',stage:'',sort:'new',q:'',watch:false,preset:''};
+const DEF={tab:'ins',cat:'',src:'',status:'진행',stage:'',sort:'new',q:'',watch:false,preset:'',low:false};
+const isLow=x=>sum(x)?.relevance==='낮음';
+const shown=()=>st.low?data:data.filter(x=>!isLow(x));
 const st={...DEF};
 let data=[],INS={};
 const $=s=>document.querySelector(s);
@@ -249,6 +252,7 @@ function syncControls(){
   $('#q').value=st.q;$('#stage').value=st.stage;$('#status').value=st.status;$('#sort').value=st.sort;
   [...$('#src').children].forEach(b=>b.classList.toggle('on',b.dataset.v===st.src));
   $('#watchOnly').classList.toggle('on',st.watch);
+  const nl=data.filter(isLow).length;$('#lowBtn').classList.toggle('on',st.low);$('#lowBtn').textContent=st.low?`관련 낮은 건 숨기기`:`관련 낮은 건 보기 (${nl})`;$('#lowBtn').hidden=!nl;
   $('#watchOnly').textContent=`★ 관심 법령${WATCH.length?` (${WATCH.length})`:''}`;
 }
 function tab(t){
@@ -292,6 +296,7 @@ function bind(){
     catch{prompt('아래 링크를 복사하세요',location.href)}};
   const setAll=open=>{let n=0;document.querySelectorAll('#grid .card').forEach(c=>{c.classList.toggle('open',open);const b=c.querySelector('[data-toggle]');if(b)b.textContent=open?'접기':'자세히 보기';n++});if(open&&n>30)toast(`${n}개 카드를 펼쳤어요`)};
   $('#openAll').onclick=()=>setAll(true);
+  $('#lowBtn').onclick=()=>{st.low=!st.low;syncControls();render()};
   $('#closeAll').onclick=()=>setAll(false);
   $('#grid').onclick=e=>{
     const w=e.target.closest('[data-watch]');
@@ -331,15 +336,15 @@ const hay=x=>{const s=sum(x)||{};return [x.title,x.proposer,x.org,x.field,x.law,
 function base(){
   const P=PRESET[st.preset];
   const qs=st.q.toLowerCase().split(/\s+/).filter(Boolean);
-  return data.filter(x=>(!P?.f||P.f(x))&&(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
+  return shown().filter(x=>(!P?.f||P.f(x))&&(!st.src||x.source===st.src)&&(!st.status||x.status===st.status)
     &&(!st.stage||stg(x).label===st.stage)&&(!st.watch||isWatched(x))
     &&(!qs.length||(h=>qs.every(q=>h.includes(q)))(hay(x))))}
 
 function render(){
-  const live=data.filter(x=>x.status==='진행');
+  const live=shown().filter(x=>x.status==='진행');
   $('#stats').innerHTML=[
     [live.length,'진행 중인 예고·규칙'],
-    [data.filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
+    [shown().filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
     [live.filter(x=>{const n=dday(x);return n!==null&&n>=0&&n<=7}).length,'7일 내 의견마감'],
     [live.filter(x=>SOON.includes(stg(x).label)).length,'곧 확정될 규칙·하위법령·고시']
   ].map(([b,s],i)=>`<button class="stat" data-go="${['live','new7','due7','soon'][i]}"><b>${b}</b><span>${s}</span></button>`).join('');
@@ -384,7 +389,7 @@ function card(x){
     <div class="top">
       <span class="b ${SRC[x.source]||'gov'}">${esc(srcName(x.source))}</span>
       ${g.label?`<span class="stage s${g.order}" title="${esc(g.speed+' · '+(g.note||''))}">${esc(g.label)}</span>`:''}
-      ${age(x.first_seen)<3?'<span class="b new">NEW</span>':''}
+      ${age(x.first_seen)<3?'<span class="b new">NEW</span>':''}${isLow(x)?'<span class="b" style="background:#f1f5f9;color:#64748b" title="AI 판단: 전력시장·발전사업과 관련 낮음">관련 낮음</span>':''}
       ${dd?`<span class="dday ${n!==null&&n>=0&&n<=3?'hot':''}">${dd}</span>`:posted?`<span class="dday">${esc(posted)}</span>`:''}
       <button class="star ${w?'on':''}" data-watch="${esc(lawKey(x))}" title="${w?'관심 법령에서 빼기':'이 법령을 관심 법령으로 등록'}">${w?'★':'☆'}</button>
     </div>

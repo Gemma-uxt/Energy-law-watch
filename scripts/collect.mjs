@@ -5,6 +5,7 @@ import { fileText } from './attach.mjs';
 
 const KW = JSON.parse(fs.readFileSync('scripts/keywords.json', 'utf8'));
 const BOARDS = fs.existsSync('scripts/boards.json') ? JSON.parse(fs.readFileSync('scripts/boards.json', 'utf8')) : [];
+const RELEVANCE = fs.existsSync('scripts/relevance.txt') ? fs.readFileSync('scripts/relevance.txt', 'utf8').trim() : '';
 const PROFILE = fs.existsSync('scripts/profile.txt') ? fs.readFileSync('scripts/profile.txt', 'utf8').trim() : '';
 const DATA = 'docs/data/bills.json';
 const META = 'docs/data/meta.json';
@@ -516,7 +517,8 @@ async function summarize(item) {
  "impact":"영향과 실무 시사점 1~2문장",
  "categories":["이 문서의 분야. 다음 중에서만, 실제로 핵심인 것만 1~3개: ${CATS.join(', ')}"],
  "who":["영향받는 주체. 다음 중에서만 고를 것: ${WHO.join(', ')}"],
- "direction":"다음 중 하나: ${DIR.join(', ')}",
+ "direction":"다음 중 하나: ${DIR.join(', ')}",${RELEVANCE ? `
+ "relevance":"높음 / 보통 / 낮음 중 하나 (아래 '관련도 기준'으로 판단)",` : ''}
  "watch":"실무자가 지금 확인하거나 준비할 점 1문장"${KOREC ? `,
  "permits":[{"name":"발전소·사업 이름(원문 그대로, 예: 포항 동백이풍력 발전사업)","kind":"${PERMIT_KINDS.join(' / ')} 중 하나","cond":"조건·사유(없으면 빈 값)"}]` : ''}${PROFILE ? `,
  "fit":"아래 '우리 관점'에서 본 영향 1문장 (관련이 적으면 '직접 관련 낮음')"` : ''}}
@@ -528,15 +530,16 @@ async function summarize(item) {
 - points에는 허가 외의 안건(규칙·규정 개정, 요금·약관 인가 등)을 안건명이 드러나게 구체적으로 적을 것.` : ''}
 categories 판단 기준: 본문에 한 번 언급된 정도가 아니라 이 문서가 실제로 바꾸는 대상의 분야만 고를 것. 예) 전기공사업·발전소 주변지역·전력망은 '전기·전력'이지 '가스·석유·자원'이 아님. '에너지 일반·효율'은 다른 분야에 딱 맞지 않을 때만.
 who 판단 기준: 원자력발전소를 운영하는 사업자(한수원 등)는 '원전 운영사'.
-direction 판단 기준: 규제받는 대상(사업자·기관·국민)의 의무·제한이 늘거나 엄격해지면 '규제강화', 줄거나 느슨해지면 '규제완화'. 온도·수치 기준은 대상이 더 자유롭게 행동할 수 있게 바뀌면 완화(예: 냉방 28℃→26℃, 난방 18℃→20℃는 완화). 강화와 완화가 섞이면 비중이 큰 쪽을 고를 것.${PROFILE ? `\n\n우리 관점: ${PROFILE}` : ''}
+${RELEVANCE ? `관련도 기준(전력시장·발전사업 실무자 관점):\n${RELEVANCE}\n문서의 핵심이 [관련도 낮음]에 해당하면 '낮음'. 에너지 분야 법이라도 내용이 공사·안전·제재·행정 절차뿐이면 '낮음'.\n` : ''}direction 판단 기준: 규제받는 대상(사업자·기관·국민)의 의무·제한이 늘거나 엄격해지면 '규제강화', 줄거나 느슨해지면 '규제완화'. 온도·수치 기준은 대상이 더 자유롭게 행동할 수 있게 바뀌면 완화(예: 냉방 28℃→26℃, 난방 18℃→20℃는 완화). 강화와 완화가 섞이면 비중이 큰 쪽을 고를 것.${PROFILE ? `\n\n우리 관점: ${PROFILE}` : ''}
 
 제목: ${item.title}
 원문:
 ${item.body.slice(0, BODY_MAX)}`;
   const s = await gemini(prompt);
   if (s) {
-    s.v = 4;
+    s.v = 5;
     delete s.importance; delete s.importance_reason;
+    if (!['높음', '보통', '낮음'].includes(s.relevance)) delete s.relevance;
     if (!Array.isArray(s.who)) s.who = [];
     if (!Array.isArray(s.points)) s.points = s.points ? [String(s.points)] : [];
     s.categories = (Array.isArray(s.categories) ? s.categories : []).filter((c) => CATS.includes(c));
@@ -547,6 +550,7 @@ ${item.body.slice(0, BODY_MAX)}`;
 
 // ---------- 인사이트 집계 ----------
 function buildInsights(list) {
+  list = list.filter((x) => x.summary?.relevance !== '낮음');   // 관련 낮은 건은 통계·브리핑에서 제외
   const dateOf = (x) => toISO(x.start) || (x.first_seen || '').slice(0, 10);
   // 수집을 시작한 날: 이 날 이전 주는 '그때 진행 중이던 건'만 잡혀 있어 실제보다 적게 보임
   const since = list.reduce((m, x) => (x.first_seen && x.first_seen.slice(0, 10) < m ? x.first_seen.slice(0, 10) : m), TODAY);
@@ -604,7 +608,7 @@ async function weeklyBriefing(list, ins, prev) {
   if (!GEMINI_KEY || OFFLINE) return prev || null;
   if (prev?.date && (Date.parse(TODAY) - Date.parse(prev.date)) / 864e5 < 7) return prev;
   const since = addDays(TODAY, -7);
-  const recent = list.filter((x) => (x.first_seen || '').slice(0, 10) >= since);
+  const recent = list.filter((x) => x.summary?.relevance !== '낮음').filter((x) => (x.first_seen || '').slice(0, 10) >= since);
   if (!recent.length) return prev || null;
   const lines = recent.slice(0, 60).map((x) => {
     const s = x.summary || {};
@@ -762,7 +766,7 @@ for (const it of fetched) {
     }
     const needPermits = prev.id.startsWith('KOREC-') && !Array.isArray(prev.summary?.permits);
     if (needPermits) { const b = await bodyOf(prev); if (b) prev.body = b; }   // 반복 글자 정리된 원문으로 다시 읽기
-    if (prev.body && (!prev.summary || (prev.summary.v || 0) < 4 || needPermits)) {   // 요약 없음·예전 요약 → 새 분석
+    if (prev.body && (!prev.summary || (prev.summary.v || 0) < 5 || needPermits)) {   // 요약 없음·예전 요약 → 새 분석
       const s = await summarize(prev);
       if (s) { prev.summary = s; console.log(`  분석 추가: ${prev.title}`); }
     }
