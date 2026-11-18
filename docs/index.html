@@ -241,7 +241,7 @@ Promise.all([
   fetch('data/meta.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/insights.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(([d,m,ins])=>{
-  data=d.map(x=>{const n=dday(x);if(n!==null&&n<0)x.status='종료';return x});
+  data=d.map(x=>{const n=dday(x);if(n!==null&&n<0&&!(x.source==='국회'&&x.progress))x.status='종료';return x});   // 국회안은 심사 단계로 판단
   INS=ins||{};
   $('#upd').textContent='마지막 수집 '+m.updated;
   $('#stage').innerHTML='<option value="">모든 단계</option>'+STAGES.map(s=>`<option>${s[0]}</option>`).join('');
@@ -379,7 +379,7 @@ function permits(arr){
 }
 function card(x){
   const n=dday(x),s=sum(x),g=stg(x);
-  const dd=n===null?'':n<0?'마감':n===0?'D-DAY':'D-'+n;
+  const dd=n===null?'':n<0?(x.source==='국회'&&x.status==='진행'?'예고 끝·심사 중':'마감'):n===0?'D-DAY':'D-'+n;
   const posted=!x.end&&(x.posted||x.start)?`게시 ${md(x.posted||x.start)}`:'';
   const li=a=>Array.isArray(a)&&a.length?`<ul>${a.map(v=>`<li>${esc(v)}</li>`).join('')}</ul>`:'';
   const sec=(h,b)=>b?`<h4>${h}</h4>${b}`:'';

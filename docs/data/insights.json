@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-18 10:43",
+ "updated": "2026-11-18 10:45",
  "since": "2026-11-10",
  "weeks": [
   {
@@ -167,7 +167,7 @@
     {
      "title": "전기사업법 일부개정법률안",
      "source": "국회",
-     "status": "종료",
+     "status": "진행",
      "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_5DDE3F2DF62D4868AB918B9E629F46",
      "proposer": "김주영의원 등 10인",
      "date": "2026-11-10",
@@ -176,7 +176,7 @@
     {
      "title": "전기사업법 일부개정법률안",
      "source": "국회",
-     "status": "종료",
+     "status": "진행",
      "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_99863E0088254CCFB63C9042E7D88A",
      "proposer": "박덕흠의원 등 10인",
      "date": "2026-11-10",
@@ -194,7 +194,7 @@
     {
      "title": "분산에너지 활성화 특별법 일부개정법률안",
      "source": "국회",
-     "status": "종료",
+     "status": "진행",
      "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_CEBC1B984C1D4665B67880ED3BBB5D",
      "proposer": "한정애의원 등 12인",
      "date": "2026-11-10",
@@ -203,7 +203,7 @@
     {
      "title": "분산에너지 활성화 특별법 일부개정법률안",
      "source": "국회",
-     "status": "종료",
+     "status": "진행",
      "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_T2T6R0Q8R0Y4Z1Y1Y1W2X3W4D8E9C2",
      "proposer": "채현일의원 등 10인",
      "date": "2026-11-10",
@@ -251,7 +251,7 @@
    "label": "국회 법률안",
    "speed": "장기·불확실",
    "note": "상임위·법사위·본회의를 모두 통과해야 하며, 상당수는 대안에 흡수되거나 임기만료로 폐기됨",
-   "n": 3
+   "n": 8
   }
  ],
  "who": [

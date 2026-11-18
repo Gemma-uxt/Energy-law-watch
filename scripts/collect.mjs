@@ -692,6 +692,8 @@ function finalize(v) {
   } else if (end) v.status = end < TODAY ? '종료' : '진행';
   else if (ok.has(v.source)) v.status = current.has(v.id) ? '진행' : '종료';
   else v.status = v.status || '진행';
+  // 국회 법률안: 입법예고가 끝나도 국회 심사가 진행 중이면 '진행' 유지 → 본회의 처리·정부이송·공포 또는 폐기·대안반영 시 '종료'
+  if (v.source === '국회' && v.progress) v.status = (v.progress.dead || v.progress.step >= 4) ? '종료' : '진행';
   if (v.summary && typeof v.summary === 'object') {
     delete v.summary.importance; delete v.summary.importance_reason;
     if (Array.isArray(v.summary.who)) v.summary.who = [...new Set(v.summary.who.map((w) => WHO_FIX[w] || w))];
