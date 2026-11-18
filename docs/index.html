@@ -45,6 +45,7 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .dday.hot{background:#dc2626;color:#fff}
 .card h3{margin:0;font-size:17px;line-height:1.45;letter-spacing:-.3px}
 .meta{font-size:13px;color:var(--sub)}
+.pm b{display:inline-block;font-size:12px;background:#dcfce7;color:#166534;border-radius:5px;padding:1px 7px;margin:6px 0 2px}.pm b.neg{background:#fee2e2;color:#991b1b}.pm small{color:var(--sub)}
 .star{border:0;background:none;cursor:pointer;font-size:18px;line-height:1;color:var(--sub);padding:0 2px}
 .star.on{color:#f59e0b}
 .card.watched{border-color:#f59e0b;box-shadow:0 0 0 1px #f59e0b inset}
@@ -363,6 +364,14 @@ function progress(x){
   return `<div class="prog ${p.dead?'dead':''}" title="국회 심사 단계: ${PROG.join(' → ')}">${PROG.map((_,i)=>`<i class="${i<p.step?'on':''}"></i>`).join('')}<b>${esc(p.label)}</b></div>`;
 }
 
+// 전기위원회: 발전소별 허가·인가 결과를 종류별로 묶어 보여주기
+const PK=['허가','조건부 허가','변경허가','양수인가','기간 연장','허가취소','허가반납','심의보류'];
+function permits(arr){
+  if(!Array.isArray(arr)||!arr.length)return '';
+  const g={};arr.forEach(p=>{(g[p.kind||'기타']||=[]).push(p)});
+  const keys=Object.keys(g).sort((a,b)=>(PK.indexOf(a)+99)%99-(PK.indexOf(b)+99)%99);
+  return `<h4>발전사업 허가·인가 결과 (${arr.length}건)</h4>`+keys.map(k=>`<div class="pm"><b class="${/취소|반납|보류/.test(k)?'neg':''}">${esc(k)} ${g[k].length}</b><ul>${g[k].map(p=>`<li>${esc(p.name)}${p.cond?`<small> — ${esc(p.cond)}</small>`:''}</li>`).join('')}</ul></div>`).join('');
+}
 function card(x){
   const n=dday(x),s=sum(x),g=stg(x);
   const dd=n===null?'':n<0?'마감':n===0?'D-DAY':'D-'+n;
@@ -384,8 +393,10 @@ function card(x){
     ${progress(x)}
     <div class="tags">${(x.categories||[]).map(c=>`<span class="tag" style="background:${color(c)}">${esc(c)}</span>`).join('')}${(s?.who||[]).map(w=>`<span class="who">${esc(w)}</span>`).join('')}</div>
     ${s?.oneline?`<div class="one">${esc(s.oneline)}</div>`:''}
+    ${Array.isArray(s?.permits)&&s.permits.length?`<div class="meta" style="margin-top:6px">🏭 ${esc(s.permits.slice(0,4).map(p=>p.name.replace(/\s*발전사업$/,'')).join(', '))}${s.permits.length>4?` 외 ${s.permits.length-4}곳`:''}</div>`:''}
     <div class="more">
       ${sec('개정 이유',p(s?.reason))}
+      ${permits(s?.permits)}
       ${sec('주요 내용',li(s?.points))}
       ${sec('영향·시사점',p(s?.impact))}
       ${sec('정책 방향',p(s?.direction))}

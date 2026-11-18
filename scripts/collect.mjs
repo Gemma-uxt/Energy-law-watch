@@ -498,12 +498,14 @@ async function gemini(prompt) {
 const WHO = ['발전사', '원전 운영사', '전력판매·한전', '집단에너지사업자', '재생에너지사업자', '가스·석유사업자',
   '수소사업자', '전력다소비 기업', '일반소비자', '지자체', '정부·공공기관', '기타'];
 const WHO_FIX = { '원자력': '원전 운영사' };   // 예전 분석 결과의 이름 정리
+const PERMIT_KINDS = ['허가', '조건부 허가', '변경허가', '양수인가', '기간 연장', '허가취소', '허가반납', '심의보류'];
 const DIR = ['규제강화', '규제완화', '지원·인센티브', '시장제도 변경', '절차·행정', '기타'];
 let aiCalls = 0;
 async function summarize(item) {
   if (!GEMINI_KEY || !item.body || item.body.length < 150 || aiCalls >= AI_MAX) return null;
   aiCalls++;
   const st = stageOf(item);
+  const KOREC = item.id.startsWith('KOREC-');
   const prompt =
 `너는 에너지 분야 법률·정책 분석가야. 아래 원문을 읽고 JSON으로만 답해.
 이 문서의 단계: ${st.label} (${st.note})
@@ -515,9 +517,14 @@ async function summarize(item) {
  "categories":["이 문서의 분야. 다음 중에서만, 실제로 핵심인 것만 1~3개: ${CATS.join(', ')}"],
  "who":["영향받는 주체. 다음 중에서만 고를 것: ${WHO.join(', ')}"],
  "direction":"다음 중 하나: ${DIR.join(', ')}",
- "watch":"실무자가 지금 확인하거나 준비할 점 1문장"${PROFILE ? `,
+ "watch":"실무자가 지금 확인하거나 준비할 점 1문장"${KOREC ? `,
+ "permits":[{"name":"발전소·사업 이름(원문 그대로, 예: 포항 동백이풍력 발전사업)","kind":"${PERMIT_KINDS.join(' / ')} 중 하나","cond":"조건·사유(없으면 빈 값)"}]` : ''}${PROFILE ? `,
  "fit":"아래 '우리 관점'에서 본 영향 1문장 (관련이 적으면 '직접 관련 낮음')"` : ''}}
-원문에 없는 내용은 지어내지 말고, 알 수 없으면 빈 값으로 둬.
+원문에 없는 내용은 지어내지 말고, 알 수 없으면 빈 값으로 둬.${KOREC ? `
+이 문서는 전기위원회 개최 결과야. 독자가 가장 알고 싶은 것은 '어떤 발전소가 허가·인가·취소를 받았는지'야.
+- permits에는 원문에 나온 발전사업 허가·조건부 허가·변경허가·양수인가·준비기간/공사계획인가기간 연장·허가취소·허가반납·심의보류 대상을 하나도 빠짐없이 발전소 이름 그대로 모두 적을 것. "다수", "등", "총 N건" 같은 뭉뚱그린 표현 금지.
+- 원문은 PDF에서 뽑아 글자 순서가 일부 뒤섞여 있을 수 있으니 문맥으로 바로잡을 것.
+- points에는 허가 외의 안건(규칙·규정 개정, 요금·약관 인가 등)을 안건명이 드러나게 구체적으로 적을 것.` : ''}
 categories 판단 기준: 본문에 한 번 언급된 정도가 아니라 이 문서가 실제로 바꾸는 대상의 분야만 고를 것. 예) 전기공사업·발전소 주변지역·전력망은 '전기·전력'이지 '가스·석유·자원'이 아님. '에너지 일반·효율'은 다른 분야에 딱 맞지 않을 때만.
 who 판단 기준: 원자력발전소를 운영하는 사업자(한수원 등)는 '원전 운영사'.
 direction 판단 기준: 규제받는 대상(사업자·기관·국민)의 의무·제한이 늘거나 엄격해지면 '규제강화', 줄거나 느슨해지면 '규제완화'. 온도·수치 기준은 대상이 더 자유롭게 행동할 수 있게 바뀌면 완화(예: 냉방 28℃→26℃, 난방 18℃→20℃는 완화). 강화와 완화가 섞이면 비중이 큰 쪽을 고를 것.${PROFILE ? `\n\n우리 관점: ${PROFILE}` : ''}
@@ -532,6 +539,7 @@ ${item.body.slice(0, BODY_MAX)}`;
     if (!Array.isArray(s.who)) s.who = [];
     if (!Array.isArray(s.points)) s.points = s.points ? [String(s.points)] : [];
     s.categories = (Array.isArray(s.categories) ? s.categories : []).filter((c) => CATS.includes(c));
+    if (KOREC) s.permits = (Array.isArray(s.permits) ? s.permits : []).filter((p) => p && p.name);
   }
   return s;
 }
@@ -751,7 +759,9 @@ for (const it of fetched) {
       const b = await bodyOf(prev);
       if (b && b.length > (prev.body || '').length) { prev.body = b; prev.summary = null; console.log(`  본문 보강: ${prev.title}`); }
     }
-    if (prev.body && (!prev.summary || (prev.summary.v || 0) < 4)) {   // 요약 없음·예전 요약 → 새 분석
+    const needPermits = prev.id.startsWith('KOREC-') && !Array.isArray(prev.summary?.permits);
+    if (needPermits) { const b = await bodyOf(prev); if (b) prev.body = b; }   // 반복 글자 정리된 원문으로 다시 읽기
+    if (prev.body && (!prev.summary || (prev.summary.v || 0) < 4 || needPermits)) {   // 요약 없음·예전 요약 → 새 분석
       const s = await summarize(prev);
       if (s) { prev.summary = s; console.log(`  분석 추가: ${prev.title}`); }
     }
