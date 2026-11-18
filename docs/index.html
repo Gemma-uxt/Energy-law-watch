@@ -83,15 +83,16 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .brief h4{margin:14px 0 4px;font-size:13px;color:#0d9488}
 .brief ul{margin:0;padding-left:18px}.brief li{margin:3px 0;font-size:14px}
 .pipe{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.help{margin-left:10px;vertical-align:middle;font-size:13px;font-weight:600;border:1px solid #ffffff66;background:#ffffff1f;color:#fff;border-radius:999px;padding:4px 12px;cursor:pointer}
-.help:hover,.help[aria-expanded=true]{background:#fff;color:#0f766e}
 .guide{margin-top:16px;background:#ffffff1f;border:1px solid #ffffff38;border-radius:14px;padding:14px 18px;font-size:14px}
 .guide p{margin:0 0 10px;opacity:1}
 .guide .routes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:4px 0 12px}
-.guide .routes div{background:#00000029;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5;cursor:pointer}
-.guide .routes div:hover{background:#00000052}
+.guide .routes .route{display:flex;flex-direction:column;align-items:flex-start;text-align:left;font:inherit;color:#fff;background:#00000029;border:1px solid #ffffff40;border-radius:10px;padding:10px 12px 10px;font-size:12.5px;line-height:1.5;cursor:pointer;transition:transform .12s,background .12s,box-shadow .12s}
+.guide .routes .route:hover{background:#00000055;transform:translateY(-2px);box-shadow:0 6px 16px #0000002e;border-color:#ffffffaa}
 .guide .routes b{display:block;font-size:13.5px;margin-bottom:2px}
-.guide .routes small{display:block;opacity:.85;margin-top:4px}
+.guide .routes small{display:block;opacity:.85;margin-top:4px;flex:1}
+.guide .routes .cnt{margin-top:8px;font-size:13px;font-weight:700;background:#fff;color:#0f766e;border-radius:999px;padding:2px 10px}
+.guide .routes .go{margin-top:6px;font-size:12px;font-weight:600;opacity:.9;text-decoration:underline;text-underline-offset:3px}
+.guide .routes .route:hover .go{opacity:1}
 .guide .legend{font-size:12.5px;opacity:.9;margin:0}
 .guide .legend i{font-style:normal;background:#ffffff2e;border-radius:5px;padding:1px 6px}
 @media(max-width:980px){.guide .routes{grid-template-columns:1fr 1fr}}
@@ -141,17 +142,17 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 </head>
 <body>
 <header><div class="wrap">
-  <h1>⚡ 에너지 룰 워치 <button class="help" id="helpBtn" aria-expanded="false">ⓘ 보는 법</button></h1>
+  <h1>⚡ 에너지 룰 워치</h1>
   <p>국회·정부 입법·행정예고와 전력시장 규칙·전기위원회 결정 중 전력·에너지 관련 건을 자동 수집·분석합니다 · <span id="upd">불러오는 중…</span></p>
-  <div class="guide" id="guide" hidden>
+  <div class="guide" id="guide">
     <p><b>무엇을 모으나요?</b> 국회 법률안, 정부 시행령·시행규칙, 부처 고시, 전력시장운영규칙 개정, 전기위원회 개최결과를 하루 3번(07·12·18시) 자동 수집하고 AI가 요약합니다.</p>
     <p><b>입법·행정예고란?</b> 법령·고시를 만들거나 고치기 전에 <b>초안을 공개하고 의견을 받는 단계</b>예요. 확정된 내용이 아니고, 이후 절차는 종류마다 다릅니다.</p>
     <div class="routes">
-      <div data-go="국회 법률안"><b>국회 법률안</b>소관위 심사 → 법사위 → 본회의 → 정부이송 → 공포<small>통과가 불확실해 정치권 관심 신호로 봐요. 카드의 막대가 현재 단계예요.</small></div>
-      <div data-go="정부 법률안"><b>정부 법률안</b>입법예고 → 법제처 → 국무회의 → 국회 제출 → (국회 심사)<small>정부 방향은 정해졌지만 국회 통과가 남아 대개 1년 안팎 걸려요.</small></div>
-      <div data-go="시행령·시행규칙"><b>시행령·시행규칙</b>입법예고 → 규제·법제처 심사 → 국무회의(부령은 생략) → 공포<small>보통 마감 후 1~3개월 안에 공포돼요. '마감·공포 전 / 공포됨'으로 표시해요.</small></div>
-      <div data-go="고시·훈령 등"><b>고시·훈령</b>행정예고 → 부처 확정 → 발령<small>국회·국무회의 없이 가장 빨리 시행돼요.</small></div>
-      <div data-go="전력시장 규칙 심의"><b>전력시장 규칙</b>규칙개정위원회 → 전기위원회 심의 → 장관 승인 → 공고·시행<small>보통 1~2개월. 전기위원회 결과에는 발전사업 허가도 함께 나와요.</small></div>
+      <button class="route" data-go="국회 법률안"><b>국회 법률안</b>소관위 심사 → 법사위 → 본회의 → 정부이송 → 공포<small>통과가 불확실해 정치권 관심 신호로 봐요. 카드의 막대가 현재 단계예요.</small><span class="cnt" data-cnt="국회 법률안">진행 중 –건</span><span class="go">목록 보기 →</span></button>
+      <button class="route" data-go="정부 법률안"><b>정부 법률안</b>입법예고 → 법제처 → 국무회의 → 국회 제출 → (국회 심사)<small>정부 방향은 정해졌지만 국회 통과가 남아 대개 1년 안팎 걸려요.</small><span class="cnt" data-cnt="정부 법률안">진행 중 –건</span><span class="go">목록 보기 →</span></button>
+      <button class="route" data-go="시행령·시행규칙"><b>시행령·시행규칙</b>입법예고 → 규제·법제처 심사 → 국무회의(부령은 생략) → 공포<small>보통 마감 후 1~3개월 안에 공포돼요. '마감·공포 전 / 공포됨'으로 표시해요.</small><span class="cnt" data-cnt="시행령·시행규칙">진행 중 –건</span><span class="go">목록 보기 →</span></button>
+      <button class="route" data-go="고시·훈령 등"><b>고시·훈령</b>행정예고 → 부처 확정 → 발령<small>국회·국무회의 없이 가장 빨리 시행돼요.</small><span class="cnt" data-cnt="고시·훈령 등">진행 중 –건</span><span class="go">목록 보기 →</span></button>
+      <button class="route" data-go="market"><b>전력시장 규칙</b>규칙개정위원회 → 전기위원회 심의 → 장관 승인 → 공고·시행<small>보통 1~2개월. 전기위원회 결과에는 발전사업 허가도 함께 나와요.</small><span class="cnt" data-cnt="전력시장 규칙 심의|확정·시행">진행 중 –건</span><span class="go">목록 보기 →</span></button>
     </div>
     <p class="legend"><b>표시 읽는 법</b> · <i>D-5</i> 의견 마감까지 남은 날 · <i>예고 끝·심사 중</i> 국회 예고는 끝났지만 심사 진행 중 · <i>마감·공포 전</i> / <i>공포 ○/○</i> 시행령·고시의 공포 여부 · <i>관련 낮음</i> AI가 공사·안전·제재 등으로 판단해 기본으로 숨긴 건(목록에서 '관련 낮은 건 보기')</p>
   </div>
@@ -269,6 +270,7 @@ function tab(t){
 const PRESET={
   live:{label:'진행 중인 예고',status:'진행'},
   new7:{label:'최근 7일 신규',status:'',f:x=>age(x.first_seen)<7,sort:'new'},
+  market:{label:'전력시장 규칙·전기위원회',status:'진행',f:x=>x.source==='전력시장'},
   soon:{label:'곧 확정될 규칙·하위법령·고시',status:'진행',f:x=>SOON.includes(stg(x).label),sort:'due'}
 };
 function go(k){
@@ -284,7 +286,6 @@ document.addEventListener('click',e=>{
 });
 
 function bind(){
-  $('#helpBtn').onclick=()=>{const g=$('#guide');g.hidden=!g.hidden;$('#helpBtn').setAttribute('aria-expanded',String(!g.hidden))};
   $('.tabs').onclick=e=>{const b=e.target.closest('button');if(b)tab(b.dataset.tab)};
   $('#q').oninput=e=>{st.q=e.target.value.trim();render()};
   $('#status').onchange=e=>{st.status=e.target.value;render()};
@@ -346,7 +347,9 @@ function base(){
 
 function render(){
   const live=shown().filter(x=>x.status==='진행');
-  // (상단 숫자 카드는 제거함)
+  // '보는 법' 칸마다 진행 중인 건수 (관련 낮은 건 숨김 설정 반영)
+  document.querySelectorAll('[data-cnt]').forEach(el=>{const ls=el.dataset.cnt.split('|');
+    el.textContent=`진행 중 ${live.filter(x=>ls.includes(stg(x).label)).length}건`});
 
   const rows=base();
   const P=PRESET[st.preset];
