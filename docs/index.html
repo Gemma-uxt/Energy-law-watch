@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>에너지 룰 워치</title>
+<title>에너지 룰 워치 (Energy Rule Watch)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 :root{--bg:#f4f6f9;--card:#fff;--text:#1d2433;--sub:#6b7280;--line:#e5e7eb;--brand:#0f766e;--soft:#f0fdfa;--chip:#f3f4f6}
@@ -12,6 +12,7 @@
 body{margin:0;font-family:Pretendard,system-ui,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
 .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
 header{background:linear-gradient(135deg,#0f766e 0%,#0e7490 55%,#1e3a8a 100%);color:#fff;padding:40px 0 36px}
+header h1 .en{font-size:.6em;font-weight:500;opacity:.8;letter-spacing:0;margin-left:4px}
 header h1{margin:0;font-size:30px;letter-spacing:-.6px}
 header p{margin:6px 0 0;opacity:.85;font-size:14px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:-60px}
@@ -142,7 +143,7 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 </head>
 <body>
 <header><div class="wrap">
-  <h1>⚡ 에너지 룰 워치</h1>
+  <h1>⚡ 에너지 룰 워치 <span class="en">(Energy Rule Watch)</span></h1>
   <p>국회·정부 입법·행정예고와 전력시장 규칙·전기위원회 결정 중 전력·에너지 관련 건을 자동 수집·분석합니다 · <span id="upd">불러오는 중…</span></p>
   <div class="guide" id="guide">
     <p><b>무엇을 모으나요?</b> 국회 법률안, 정부 시행령·시행규칙, 부처 고시, 전력시장운영규칙 개정, 전기위원회 개최결과를 하루 3번(07·12·18시) 자동 수집하고 AI가 요약합니다.</p>
