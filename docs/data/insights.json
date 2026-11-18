@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-18 10:20",
+ "updated": "2026-11-18 10:31",
  "since": "2026-11-10",
  "weeks": [
   {
@@ -54,21 +54,18 @@
   {
    "from": "2026-10-08",
    "to": "2026-10-14",
-   "total": 2,
+   "total": 1,
    "cats": {
-    "전기·전력": 2,
-    "재생에너지·PPA": 1,
-    "에너지 일반·효율": 1
+    "전기·전력": 1,
+    "재생에너지·PPA": 1
    },
    "partial": true
   },
   {
    "from": "2026-10-15",
    "to": "2026-10-21",
-   "total": 1,
-   "cats": {
-    "전기·전력": 1
-   },
+   "total": 0,
+   "cats": {},
    "partial": true
   },
   {
@@ -109,14 +106,13 @@
   {
    "from": "2026-11-12",
    "to": "2026-11-18",
-   "total": 13,
+   "total": 3,
    "cats": {
-    "전기·전력": 5,
-    "원자력": 6,
-    "재생에너지·PPA": 3,
-    "에너지 일반·효율": 3,
+    "전기·전력": 2,
+    "재생에너지·PPA": 2,
+    "원자력": 1,
     "가스·석유·자원": 1,
-    "탈탄소·기후": 1
+    "에너지 일반·효율": 1
    },
    "partial": false
   }
@@ -124,7 +120,7 @@
  "momentum": [
   {
    "cat": "탈탄소·기후",
-   "recent": 2,
+   "recent": 1,
    "before": 0
   },
   {
@@ -134,17 +130,17 @@
   },
   {
    "cat": "전기·전력",
-   "recent": 13,
-   "before": 3
+   "recent": 10,
+   "before": 2
   },
   {
    "cat": "재생에너지·PPA",
-   "recent": 6,
+   "recent": 5,
    "before": 2
   },
   {
    "cat": "원자력",
-   "recent": 6,
+   "recent": 1,
    "before": 0.5
   },
   {
@@ -154,66 +150,20 @@
   },
   {
    "cat": "에너지 일반·효율",
-   "recent": 5,
-   "before": 0.5
+   "recent": 3,
+   "before": 0
   }
  ],
  "momentumReady": false,
  "momentumFrom": "2027-02-02",
  "hot": [
   {
-   "law": "전기공사업법",
-   "count": 3,
-   "stages": [
-    "국회 법률안",
-    "시행령·시행규칙"
-   ],
-   "items": [
-    {
-     "title": "전기공사업법 일부개정법률안",
-     "source": "국회",
-     "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_1DCC95B8ABA7434BB232578770D638",
-     "proposer": "박정의원 등 12인",
-     "date": "2026-11-18",
-     "oneline": "전기공사업법 위반 시 대체과징금 상한액을 상향하고 부정청탁 및 뇌물수수 금지 등 규제를 신설함"
-    },
-    {
-     "title": "전기공사업법 일부개정법률안",
-     "source": "국회",
-     "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_140519A1055B4DF49ADED34F3AC327",
-     "proposer": "박정의원 등 12인",
-     "date": "2026-11-18",
-     "oneline": "전기공사 불법 하도급 방지 및 공사대금 지급보증제도 도입"
-    },
-    {
-     "title": "전기공사업법 시행규칙 일부개정령안 입법예고",
-     "source": "정부",
-     "status": "진행",
-     "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/88990",
-     "proposer": "기후에너지환경부",
-     "date": "2026-10-15",
-     "oneline": "전기공사업 실적 신고 기준금액 상향 및 불법 하도급 행정처분 기준 정비"
-    }
-   ]
-  },
-  {
    "law": "전기사업법",
-   "count": 3,
+   "count": 2,
    "stages": [
     "국회 법률안"
    ],
    "items": [
-    {
-     "title": "전기사업법 일부개정법률안",
-     "source": "국회",
-     "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_373CCF9E539A4834B8AA96EA49B27B",
-     "proposer": "김태선의원 등 11인",
-     "date": "2026-11-14",
-     "oneline": "노후 발전설비 안전관리 강화를 위한 전기사업법 개정안"
-    },
     {
      "title": "전기사업법 일부개정법률안",
      "source": "국회",
@@ -231,60 +181,6 @@
      "proposer": "박덕흠의원 등 10인",
      "date": "2026-11-10",
      "oneline": "전력산업기반기금 부담금 부과율 인하 및 감면 근거 마련"
-    }
-   ]
-  },
-  {
-   "law": "원자력안전법",
-   "count": 2,
-   "stages": [
-    "국회 법률안"
-   ],
-   "items": [
-    {
-     "title": "원자력안전법 일부개정법률안",
-     "source": "국회",
-     "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_D38EF8EBA71840AC97FAD71CC10022",
-     "proposer": "이헌승의원 등 12인",
-     "date": "2026-11-18",
-     "oneline": "해상 설치 원자로의 주기적 안전성평가 기준 마련"
-    },
-    {
-     "title": "원자력안전법 일부개정법률안",
-     "source": "국회",
-     "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_F586A72EBD5B4C599F7B29E47B137E",
-     "proposer": "윤한홍의원 등 13인",
-     "date": "2026-11-14",
-     "oneline": "원전 계속운전기간 산정 시 심사 지연으로 미가동된 기간을 제외함"
-    }
-   ]
-  },
-  {
-   "law": "원자력시설 등의 방호 및 방사능 방재 대책법",
-   "count": 2,
-   "stages": [
-    "시행령·시행규칙"
-   ],
-   "items": [
-    {
-     "title": "원자력시설 등의 방호 및 방사능 방재 대책법 시행령 일부개정령안 입법예고",
-     "source": "정부",
-     "status": "진행",
-     "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/89520",
-     "proposer": "원자력안전위원회",
-     "date": "2026-11-13",
-     "oneline": "원자력시설 물리적방호 책임 확대에 따른 하위법령 정비"
-    },
-    {
-     "title": "원자력시설 등의 방호 및 방사능 방재 대책법 시행규칙 일부개정령안 입법예고",
-     "source": "정부",
-     "status": "진행",
-     "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/89492",
-     "proposer": "원자력안전위원회",
-     "date": "2026-11-13",
-     "oneline": "원자력시설 물리적방호 책임 확대에 따른 시행규칙 개정안 입법예고"
     }
    ]
   },
@@ -339,7 +235,7 @@
    "label": "고시·훈령 등",
    "speed": "가장 빠름(수주~수개월)",
    "note": "국회를 거치지 않고 부처가 확정해 발령하는 행정규칙",
-   "n": 3
+   "n": 2
   },
   {
    "order": 3,
@@ -347,7 +243,7 @@
    "label": "시행령·시행규칙",
    "speed": "빠름(보통 수개월)",
    "note": "국회 의결 없이 규제·법제처 심사와 국무회의(부령은 장관 발령)로 확정",
-   "n": 5
+   "n": 1
   },
   {
    "order": 5,
@@ -355,79 +251,67 @@
    "label": "국회 법률안",
    "speed": "장기·불확실",
    "note": "상임위·법사위·본회의를 모두 통과해야 하며, 상당수는 대안에 흡수되거나 임기만료로 폐기됨",
-   "n": 9
+   "n": 2
   }
  ],
  "who": [
   [
-   "정부·공공기관",
-   11
-  ],
-  [
    "발전사",
-   8
+   7
   ],
   [
    "재생에너지사업자",
-   8
+   7
   ],
   [
    "전력판매·한전",
    6
   ],
   [
-   "원전 운영사",
+   "집단에너지사업자",
    5
   ],
   [
-   "기타",
-   3
-  ],
-  [
-   "집단에너지사업자",
-   3
+   "정부·공공기관",
+   5
   ],
   [
    "가스·석유사업자",
    3
   ],
   [
-   "전력다소비 기업",
+   "원전 운영사",
    2
+  ],
+  [
+   "전력다소비 기업",
+   1
   ],
   [
    "일반소비자",
-   2
+   1
   ],
   [
    "지자체",
-   2
-  ],
-  [
-   "발전사업자",
    1
   ]
  ],
  "direction": [
   [
    "규제강화",
-   8
+   4
   ],
   [
    "시장제도 변경",
-   6
-  ],
-  [
-   "지원·인센티브",
-   4
+   3
   ],
   [
    "규제완화",
-   4
+   2
   ],
   [
-   "절차·행정",
-   1
+   "지원·인센티브",
+   2
   ]
  ],
  "briefing": {
