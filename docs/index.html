@@ -265,7 +265,6 @@ function tab(t){
 const PRESET={
   live:{label:'진행 중인 예고',status:'진행'},
   new7:{label:'최근 7일 신규',status:'',f:x=>age(x.first_seen)<7,sort:'new'},
-  due7:{label:'7일 내 의견마감',status:'진행',f:x=>{const n=dday(x);return n!==null&&n>=0&&n<=7},sort:'due'},
   soon:{label:'곧 확정될 규칙·하위법령·고시',status:'진행',f:x=>SOON.includes(stg(x).label),sort:'due'}
 };
 function go(k){
@@ -347,7 +346,8 @@ function render(){
     [shown().filter(x=>age(x.first_seen)<7).length,'최근 7일 신규'],
     [live.filter(x=>{const n=dday(x);return n!==null&&n>=0&&n<=7}).length,'7일 내 의견마감'],
     [live.filter(x=>SOON.includes(stg(x).label)).length,'곧 확정될 규칙·하위법령·고시']
-  ].map(([b,s],i)=>`<button class="stat" data-go="${['live','new7','due7','soon'][i]}"><b>${b}</b><span>${s}</span></button>`).join('');
+  ].map(([b,s],i)=>{const k=['live','new7','','soon'][i];   // 7일 내 의견마감은 숫자만 표시(누르면 거르는 기능 없음)
+    return k?`<button class="stat" data-go="${k}"><b>${b}</b><span>${s}</span></button>`:`<div class="stat" style="cursor:default"><b>${b}</b><span>${s}</span></div>`}).join('');
 
   const rows=base();
   const P=PRESET[st.preset];
