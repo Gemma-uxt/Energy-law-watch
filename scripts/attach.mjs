@@ -247,7 +247,7 @@ export async function fileText(buf, name = '') {
   else throw new Error('지원하지 않는 형식: ' + name);
   // 굵은 글씨를 겹쳐 찍은 PDF는 '제제제제…', '331331331…'처럼 같은 글자가 반복돼 나옴 → 1번으로 줄이기
   t = t.replace(/([^\d\s])\1{3,}/g, '$1')                      // 같은 글자 4번 이상 (숫자 제외: 1,000,000 보호)
-    .replace(/(.{2,6}?)\1{3,}/g, (m, u) => {
+    .replace(/(.{2,20}?)\1{3,}/g, (m, u) => {
       if (/^[\d,.\s]+$/.test(u)) return new Set(u).size > 1 && m.length >= u.length * 6 ? u : m;   // 0000 같은 숫자는 그대로
       return u;
     });

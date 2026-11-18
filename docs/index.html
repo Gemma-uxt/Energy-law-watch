@@ -365,12 +365,12 @@ function progress(x){
 }
 
 // 전기위원회: 발전소별 허가·인가 결과를 종류별로 묶어 보여주기
-const PK=['허가','조건부 허가','변경허가','양수인가','기간 연장','허가취소','허가반납','심의보류'];
+const PK=['허가','조건부 허가','변경허가','양수인가','기간 연장','연장 불승인','허가취소','허가반납','심의보류'];
 function permits(arr){
   if(!Array.isArray(arr)||!arr.length)return '';
   const g={};arr.forEach(p=>{(g[p.kind||'기타']||=[]).push(p)});
   const keys=Object.keys(g).sort((a,b)=>(PK.indexOf(a)+99)%99-(PK.indexOf(b)+99)%99);
-  return `<h4>발전사업 허가·인가 결과 (${arr.length}건)</h4>`+keys.map(k=>`<div class="pm"><b class="${/취소|반납|보류/.test(k)?'neg':''}">${esc(k)} ${g[k].length}</b><ul>${g[k].map(p=>`<li>${esc(p.name)}${p.cond?`<small> — ${esc(p.cond)}</small>`:''}</li>`).join('')}</ul></div>`).join('');
+  return `<h4>발전사업 허가·인가 결과 (${arr.length}건)</h4>`+keys.map(k=>`<div class="pm"><b class="${/취소|반납|보류|불승인/.test(k)?'neg':''}">${esc(k)} ${g[k].length}</b><ul>${g[k].map(p=>`<li>${esc(p.name)}${p.cond?`<small> — ${esc(p.cond)}</small>`:''}</li>`).join('')}</ul></div>`).join('');
 }
 function card(x){
   const n=dday(x),s=sum(x),g=stg(x);
