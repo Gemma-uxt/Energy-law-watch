@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>에너지 입법예고 워치</title>
+<title>에너지 룰 워치</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 :root{--bg:#f4f6f9;--card:#fff;--text:#1d2433;--sub:#6b7280;--line:#e5e7eb;--brand:#0f766e;--soft:#f0fdfa;--chip:#f3f4f6}
@@ -83,9 +83,22 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 .brief h4{margin:14px 0 4px;font-size:13px;color:#0d9488}
 .brief ul{margin:0;padding-left:18px}.brief li{margin:3px 0;font-size:14px}
 .pipe{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.help{margin-left:10px;vertical-align:middle;font-size:13px;font-weight:600;border:1px solid #ffffff66;background:#ffffff1f;color:#fff;border-radius:999px;padding:4px 12px;cursor:pointer}
+.help:hover,.help[aria-expanded=true]{background:#fff;color:#0f766e}
+.guide{margin-top:16px;background:#ffffff1f;border:1px solid #ffffff38;border-radius:14px;padding:14px 18px;font-size:14px}
+.guide p{margin:0 0 10px;opacity:1}
+.guide .routes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:4px 0 12px}
+.guide .routes div{background:#00000029;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5;cursor:pointer}
+.guide .routes div:hover{background:#00000052}
+.guide .routes b{display:block;font-size:13.5px;margin-bottom:2px}
+.guide .routes small{display:block;opacity:.85;margin-top:4px}
+.guide .legend{font-size:12.5px;opacity:.9;margin:0}
+.guide .legend i{font-style:normal;background:#ffffff2e;border-radius:5px;padding:1px 6px}
+@media(max-width:980px){.guide .routes{grid-template-columns:1fr 1fr}}
 .step{border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:var(--bg)}
 .step:hover{border-color:var(--brand)}
 .step b{font-size:26px;display:block;margin-top:6px}
+.step small.route{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);color:var(--text)}
 .step small{display:block;color:var(--sub);font-size:12px;line-height:1.45;margin-top:2px}
 .bars{display:flex;align-items:stretch;gap:6px;height:170px;margin-bottom:26px}
 .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
@@ -107,15 +120,6 @@ select{padding:11px 12px;border:1px solid var(--line);border-radius:12px;backgro
 footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 @media(max-width:980px){.pipe{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.grid,.ins{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}header h1{font-size:24px}.grid{grid-template-columns:1fr}}
-.what{margin-top:18px;background:#ffffff1f;border:1px solid #ffffff38;border-radius:14px;padding:14px 18px}
-.what p{margin:0 0 10px;opacity:1;font-size:14.5px}
-.what .road{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px}
-.what .road span{background:#ffffff26;padding:4px 11px;border-radius:999px}
-.what .road span.here{background:#fff;color:#0f766e;font-weight:700}
-.what .road i{font-style:normal;opacity:.6}
-.what .paths{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
-.what .paths div{background:#00000029;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5}
-.what .paths b{display:block;font-size:13.5px}
 @media(max-width:760px){.what .paths{grid-template-columns:1fr 1fr}}
 
 .tip{position:fixed;z-index:50;pointer-events:none;display:none;min-width:180px;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px #0000002e;padding:10px 12px;font-size:12.5px}
@@ -129,8 +133,6 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 
 .stat{font:inherit;color:var(--text);text-align:left;cursor:pointer;width:100%;transition:transform .15s,border-color .15s}
 .stat:hover{transform:translateY(-2px);border-color:var(--brand)}
-.what .paths [data-go]{cursor:pointer;transition:background .15s}
-.what .paths [data-go]:hover{background:#00000052}
 .pre{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:9px 14px;background:var(--soft);border:1px solid #99f6e4;border-radius:10px;font-size:13.5px}
 .pre:empty{display:none}
 .pre button{margin-left:auto;border:0;background:none;color:var(--brand);font:inherit;font-weight:600;cursor:pointer}
@@ -139,21 +141,19 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 </head>
 <body>
 <header><div class="wrap">
-  <h1>⚡ 에너지 입법예고 워치</h1>
-  <p>국회·정부 입법·행정예고와 전력시장 규칙 개정 중 탈탄소·전력·집단에너지·재생에너지 관련 건을 자동 수집·분석합니다 · <span id="upd">불러오는 중…</span></p>
-  <div class="what">
-    <p>📌 <b>입법예고란?</b> 법령을 만들거나 고치기 전에 초안을 공개하고 의견을 받는 절차입니다. <b>확정된 법이 아니라 '초안 공개' 단계</b>예요.</p>
-    <div class="road">
-      <span>초안 작성</span><i>→</i><span class="here">📍 입법·행정예고 (의견 접수)</span><i>→</i>
-      <span>심사·수정</span><i>→</i><span>의결·승인</span><i>→</i><span>공포·시행</span>
+  <h1>⚡ 에너지 룰 워치 <button class="help" id="helpBtn" aria-expanded="false">ⓘ 보는 법</button></h1>
+  <p>국회·정부 입법·행정예고와 전력시장 규칙·전기위원회 결정 중 전력·에너지 관련 건을 자동 수집·분석합니다 · <span id="upd">불러오는 중…</span></p>
+  <div class="guide" id="guide" hidden>
+    <p><b>무엇을 모으나요?</b> 국회 법률안, 정부 시행령·시행규칙, 부처 고시, 전력시장운영규칙 개정, 전기위원회 개최결과를 하루 3번(07·12·18시) 자동 수집하고 AI가 요약합니다.</p>
+    <p><b>입법·행정예고란?</b> 법령·고시를 만들거나 고치기 전에 <b>초안을 공개하고 의견을 받는 단계</b>예요. 확정된 내용이 아니고, 이후 절차는 종류마다 다릅니다.</p>
+    <div class="routes">
+      <div data-go="국회 법률안"><b>국회 법률안</b>소관위 심사 → 법사위 → 본회의 → 정부이송 → 공포<small>통과가 불확실해 정치권 관심 신호로 봐요. 카드의 막대가 현재 단계예요.</small></div>
+      <div data-go="정부 법률안"><b>정부 법률안</b>입법예고 → 법제처 → 국무회의 → 국회 제출 → (국회 심사)<small>정부 방향은 정해졌지만 국회 통과가 남아 대개 1년 안팎 걸려요.</small></div>
+      <div data-go="시행령·시행규칙"><b>시행령·시행규칙</b>입법예고 → 규제·법제처 심사 → 국무회의(부령은 생략) → 공포<small>보통 마감 후 1~3개월 안에 공포돼요. '마감·공포 전 / 공포됨'으로 표시해요.</small></div>
+      <div data-go="고시·훈령 등"><b>고시·훈령</b>행정예고 → 부처 확정 → 발령<small>국회·국무회의 없이 가장 빨리 시행돼요.</small></div>
+      <div data-go="전력시장 규칙 심의"><b>전력시장 규칙</b>규칙개정위원회 → 전기위원회 심의 → 장관 승인 → 공고·시행<small>보통 1~2개월. 전기위원회 결과에는 발전사업 허가도 함께 나와요.</small></div>
     </div>
-    <div class="paths">
-      <div data-go="국회 법률안"><b>국회 법률안 →</b>상임위·법사위·본회의가 남아 통과가 불확실해요. 정치권의 관심 신호로 보세요.</div>
-      <div data-go="정부 법률안"><b>정부 법률안 →</b>정부 방향은 정해졌지만 국회 통과가 남았어요. 대개 1년 안팎 이상 걸려요.</div>
-      <div data-go="시행령·시행규칙"><b>시행령·시행규칙 →</b>국회를 거치지 않아 보통 수개월 안에 확정돼요. 실무 준비 신호예요.</div>
-      <div data-go="고시·훈령 등"><b>고시·훈령 →</b>부처가 자체 결정해 가장 빨리 시행돼요. 의견을 낼 마지막 기회예요.</div>
-      <div data-go="전력시장 규칙 심의"><b>전력시장 규칙 →</b>규칙개정위·전기위원회 심의 후 장관 승인으로 1~2개월 안에 시행돼요.</div>
-    </div>
+    <p class="legend"><b>표시 읽는 법</b> · <i>D-5</i> 의견 마감까지 남은 날 · <i>예고 끝·심사 중</i> 국회 예고는 끝났지만 심사 진행 중 · <i>마감·공포 전</i> / <i>공포 ○/○</i> 시행령·고시의 공포 여부 · <i>관련 낮음</i> AI가 공사·안전·제재 등으로 판단해 기본으로 숨긴 건(목록에서 '관련 낮은 건 보기')</p>
   </div>
 </div></header>
 
@@ -190,12 +190,12 @@ footer{text-align:center;color:var(--sub);font-size:12px;padding:10px 0 30px}
 const COLORS={"탈탄소·기후":"#16a34a","집단에너지·열":"#ea580c","전기·전력":"#2563eb","재생에너지·PPA":"#0d9488","원자력":"#7c3aed","수소":"#0891b2","가스·석유·자원":"#b45309","에너지 일반·효율":"#64748b"};
 // [단계, 속도, 설명] — 왼쪽일수록 빨리 현실이 됨
 const STAGES=[
- ['확정·시행','이미 확정','전력시장 규칙 개정이 공고·시행됨'],
- ['전력시장 규칙 심의','매우 빠름(1~2개월)','규칙개정위·전기위원회 심의 후 장관 승인'],
- ['고시·훈령 등','가장 빠름(수주~수개월)','국회 없이 부처가 확정·발령'],
- ['시행령·시행규칙','빠름(보통 수개월)','국회 의결 없이 국무회의 등으로 확정'],
- ['정부 법률안','중기(국회 심사 필요)','국무회의 후 국회 제출, 국회 통과가 남음'],
- ['국회 법률안','장기·불확실','통과가 불확실한 정치권 관심 신호']];
+ ['확정·시행','이미 확정','전력시장 규칙 개정이 공고·시행됨','공고 → 시행'],
+ ['전력시장 규칙 심의','매우 빠름(1~2개월)','규칙개정위·전기위원회 심의 후 장관 승인','규칙개정위 → 전기위 → 장관 승인'],
+ ['고시·훈령 등','가장 빠름(수주~수개월)','국회 없이 부처가 확정·발령','행정예고 → 발령'],
+ ['시행령·시행규칙','빠름(보통 수개월)','국회 의결 없이 국무회의 등으로 확정','예고 → 법제처 → 국무회의 → 공포'],
+ ['정부 법률안','중기(국회 심사 필요)','국무회의 후 국회 제출, 국회 통과가 남음','예고 → 국무회의 → 국회 제출'],
+ ['국회 법률안','장기·불확실','통과가 불확실한 정치권 관심 신호','소관위 → 법사위 → 본회의']];
 const SOON=['전력시장 규칙 심의','고시·훈령 등','시행령·시행규칙'];
 const SRC={'국회':'na','정부':'gov','행정규칙':'adm','부처':'min','전력시장':'kpx'};
 const PROG=['접수','소관위','법사위','본회의','정부이송','공포'];
@@ -284,6 +284,7 @@ document.addEventListener('click',e=>{
 });
 
 function bind(){
+  $('#helpBtn').onclick=()=>{const g=$('#guide');g.hidden=!g.hidden;$('#helpBtn').setAttribute('aria-expanded',String(!g.hidden))};
   $('.tabs').onclick=e=>{const b=e.target.closest('button');if(b)tab(b.dataset.tab)};
   $('#q').oninput=e=>{st.q=e.target.value.trim();render()};
   $('#status').onchange=e=>{st.status=e.target.value;render()};
@@ -425,8 +426,8 @@ function renderIns(){
   const I=INS,el=$('#tab-ins');
   if(!I.weeks){el.innerHTML='<div class="ins"><div class="panel wide"><p class="hint">인사이트는 다음 자동 수집 때 처음 만들어집니다.</p></div></div>';return}
   const hist=(I.history||[]).filter(Boolean);
-  const pipe=STAGES.map(([l,speed,note],i)=>{const s=(I.stages||[]).find(v=>v.label===l);
-    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small></div>`}).join('');
+  const pipe=STAGES.map(([l,speed,note,route],i)=>{const s=(I.stages||[]).find(v=>v.label===l);
+    return `<div class="step" data-stage="${esc(l)}"><span class="stage s${i}">${esc(l)}</span><b>${s?s.n:0}</b><small>${esc(speed)}</small><small>${esc(note)}</small><small class="route">${esc(route)}</small></div>`}).join('');
   const max=Math.max(1,...I.weeks.map(w=>w.total));
   const bars=I.weeks.map((w,wi)=>{
     const e=Object.entries(w.cats);

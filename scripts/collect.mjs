@@ -648,7 +648,7 @@ function writeFeed(list) {
       (x.categories || []).map((c) => `<category>${xmlEsc(c)}</category>`).join('') + '</item>';
   }).join('\n');
   fs.writeFileSync(FEED, `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"><channel><title>에너지 입법예고 워치</title><link>${xmlEsc(SITE)}</link>
+<rss version="2.0"><channel><title>에너지 룰 워치</title><link>${xmlEsc(SITE)}</link>
 <description>에너지 관련 입법·행정예고와 전력시장 규칙 개정 새 소식</description><language>ko</language>
 <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${items}

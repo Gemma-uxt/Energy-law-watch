@@ -1,4 +1,4 @@
-# Energy-law-watch
+# 에너지 룰 워치 (Energy-law-watch)
 
 에너지 관련 입법·행정예고와 전력시장 규칙 개정을 하루 3번(07·12·18시) 자동 수집·분석하는 페이지입니다.
 https://gemma-uxt.github.io/Energy-law-watch/
