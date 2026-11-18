@@ -608,11 +608,11 @@ async function weeklyBriefing(list, ins, prev) {
   if (!GEMINI_KEY || OFFLINE) return prev || null;
   if (prev?.date && (Date.parse(TODAY) - Date.parse(prev.date)) / 864e5 < 7) return prev;
   const since = addDays(TODAY, -7);
-  const recent = list.filter((x) => x.summary?.relevance !== '낮음').filter((x) => (x.first_seen || '').slice(0, 10) >= since);
+  const recent = list.filter((x) => (x.first_seen || '').slice(0, 10) >= since);
   if (!recent.length) return prev || null;
-  const lines = recent.slice(0, 60).map((x) => {
+  const lines = recent.slice(0, 60).map((x, i) => {
     const s = x.summary || {};
-    return `- [${x.stage.label}] ${x.title} | 분야:${(x.categories || []).join('/')} | 마감:${x.end || '-'} | ${s.oneline || ''}`;
+    return `${i + 1}. [${x.stage.label}] ${x.title} | 분야:${(x.categories || []).join('/')} | 마감:${x.end || '-'} | ${s.oneline || ''}`;
   }).join('\n');
   const prompt =
 `너는 에너지 정책 애널리스트야. 지난 7일간 새로 올라온 에너지 관련 입법·행정예고와 전력시장 규칙 개정 목록을 보고 실무자용 주간 브리핑을 JSON으로만 써.
@@ -622,7 +622,8 @@ async function weeklyBriefing(list, ins, prev) {
  "trends":["눈에 띄는 흐름 2~4개. 여러 건이 같은 방향을 가리킬 때만 흐름이라고 쓸 것"],
  "soon":["곧 확정·시행될 가능성이 높은 변화 최대 3개(법령명 포함)"],
  "signals":["국회 법률안에서 읽히는 정치권 관심사 최대 3개"],
- "actions":["의견제출 마감 등 이번 주에 챙길 일 최대 3개"]}
+ "actions":["의견제출 마감 등 이번 주에 챙길 일 최대 3개"],
+ "refs":[위 브리핑 문장들에서 실제로 언급한 목록 번호들]}
 목록에 없는 사실은 쓰지 마.${PROFILE ? `\n우리 관점: ${PROFILE}` : ''}
 여러 건이 몰린 법령: ${ins.hot.map((h) => `${h.law}(${h.count}건)`).join(', ') || '없음'}
 목록:
@@ -630,7 +631,9 @@ ${lines}`;
   const b = await gemini(prompt);
   if (!b) return prev || null;
   console.log('  주간 브리핑 작성 완료');
-  return { ...b, date: TODAY, count: recent.length };
+  const ids = (Array.isArray(b.refs) ? b.refs : []).map((n) => recent[Number(n) - 1]?.id).filter(Boolean);
+  delete b.refs;
+  return { ...b, date: TODAY, count: recent.length, ids };
 }
 
 // ---------- 알림: RSS 피드 + (선택) 텔레그램 ----------
@@ -804,6 +807,33 @@ const ins = buildInsights(list);
 ins.briefing = await weeklyBriefing(list, ins, prevIns.briefing);
 ins.history = [ins.briefing, ...(prevIns.history || []).filter((b) => b && b.date !== ins.briefing?.date)]
   .filter(Boolean).slice(0, 12);
+// 주간 브리핑에 언급된 건은 '관련 낮음'으로 숨기지 않음
+// (브리핑에 번호 목록(ids)이 없는 예전 브리핑은 문장과 요약의 단어가 많이 겹치는 건으로 찾음)
+let briefFix = 0;
+const bg = (t) => { const u = normT(t); return [...new Set([...u].slice(0, -1).map((c, i) => c + u[i + 1]))]; };
+const DF = {};
+for (const x of list) for (const g of bg(x.summary?.oneline)) DF[g] = (DF[g] || 0) + 1;
+for (const b of ins.history) {
+  const text = [b.headline, ...(b.trends || []), ...(b.soon || []), ...(b.signals || []), ...(b.actions || [])].join(' ');
+  for (const x of list) {
+    let hit = (b.ids || []).includes(x.id);
+    if (!hit && !b.ids) {
+      // ① 브리핑 문장에 법령·고시 제목 앞부분이 그대로 나오거나 ② 한 줄 요약과 글자쌍이 절반 이상 겹치면 언급된 것으로 봄
+      const core = normT(x.title.replace(/(입법|행정)예고$/, '')).slice(0, 14);
+      const T = normT(text);
+      const g = bg(x.summary?.oneline).filter((v) => (DF[v] || 0) < 3);   // 여러 건에 흔한 글자쌍(전기·사업 등)은 빼고 비교
+      hit = (core.length >= 10 && T.includes(core) && x.source !== '국회')
+        || (g.length >= 8 && g.filter((v) => T.includes(v)).length / g.length >= 0.3);
+    }
+    if (hit && !x.briefed) { x.briefed = b.date; briefFix++; }
+  }
+}
+for (const x of list) if (x.briefed && x.summary?.relevance === '낮음') x.summary.relevance = '보통';
+if (briefFix) {
+  fs.writeFileSync(DATA, JSON.stringify(list, null, 1));
+  Object.assign(ins, buildInsights(list), { briefing: ins.briefing, history: ins.history });
+  console.log(`  브리핑 언급 건 ${briefFix}건 → 관련 낮음에서 제외`);
+}
 fs.writeFileSync(INS, JSON.stringify(ins, null, 1));
 await telegram(newItems.map((x) => list.find((y) => y.id === x.id) || x), list);
 console.log(`신규 ${newItems.length}건 / 누적 ${old.size}건 / AI 분석 ${aiCalls}회`);
