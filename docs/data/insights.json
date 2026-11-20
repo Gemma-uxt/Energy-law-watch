@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20 03:22",
+ "updated": "2026-11-20 12:27",
  "since": "2026-11-10",
  "weeks": [
   {
@@ -108,11 +108,11 @@
   {
    "from": "2026-11-14",
    "to": "2026-11-20",
-   "total": 4,
+   "total": 3,
    "cats": {
-    "원자력": 3,
     "전기·전력": 2,
-    "재생에너지·PPA": 2
+    "재생에너지·PPA": 2,
+    "원자력": 2
    },
    "partial": false
   }
@@ -140,7 +140,7 @@
   },
   {
    "cat": "원자력",
-   "recent": 3,
+   "recent": 2,
    "before": 0.5
   },
   {
@@ -157,33 +157,6 @@
  "momentumReady": false,
  "momentumFrom": "2027-02-02",
  "hot": [
-  {
-   "law": "원자력안전법",
-   "count": 2,
-   "stages": [
-    "국회 법률안"
-   ],
-   "items": [
-    {
-     "title": "원자력안전법 일부개정법률안",
-     "source": "국회",
-     "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_8DC39795801A42B496EFA59608A79F",
-     "proposer": "이주희의원 등 19인",
-     "date": "2026-11-20",
-     "oneline": ""
-    },
-    {
-     "title": "원자력안전법 일부개정법률안",
-     "source": "국회",
-     "status": "진행",
-     "link": "https://pal.assembly.go.kr/napal/lgsltpa/lgsltpaOngoing/view.do?lgsltPaId=PRC_F586A72EBD5B4C599F7B29E47B137E",
-     "proposer": "윤한홍의원 등 13인",
-     "date": "2026-11-14",
-     "oneline": "원자력발전소 계속운전기간 산정 시 심사 지연으로 미가동된 기간을 제외함"
-    }
-   ]
-  },
   {
    "law": "전기사업법",
    "count": 2,
@@ -278,7 +251,7 @@
    "label": "국회 법률안",
    "speed": "장기·불확실",
    "note": "상임위·법사위·본회의를 모두 통과해야 하며, 상당수는 대안에 흡수되거나 임기만료로 폐기됨",
-   "n": 9
+   "n": 8
   }
  ],
  "who": [
